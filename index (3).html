@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nano Banana: Final Fix</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    
+    <style>
+        :root {
+            /* --- دارک مود --- */
+            --bg: #212121;
+            --text-main: #e0e0e0;
+            --text-muted: #777;
+            --accent: #00e5ff; 
+            --accent-sec: #FFD700; 
+            --loader-color: #00f2ff;
+            --shadow-out: 8px 8px 16px #161616, -8px -8px 16px #2c2c2c;
+            --shadow-in: inset 8px 8px 16px #161616, inset -8px -8px 16px #2c2c2c;
+            --card-bg: #212121;
+            --input-bg: #212121;
+        }
+
+        body.light-mode {
+            /* --- لایت مود (آبی نفتی + فیروزه‌ای) --- */
+            --bg: #eef2f9;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --accent: #5a67d8; 
+            --accent-sec: #d97706; 
+            --loader-color: #5a67d8;
+            --shadow-out: 6px 6px 14px #d1d9e6, -6px -6px 14px #ffffff;
+            --shadow-in: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff;
+            --card-bg: #eef2f9;
+            --input-bg: #eef2f9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
+        
+        body { 
+            background-color: var(--bg); color: var(--text-main); min-height: 100vh; 
+            display: flex; flex-direction: column; align-items: center; padding: 20px; transition: 0.4s ease;
+        }
+
+        .container { width: 100%; max-width: 500px; padding-bottom: 80px; }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; padding: 5px;
+        }
+        .theme-btn {
+            width: 45px; height: 45px; border-radius: 50%; background: var(--bg); border: none; color: var(--text-main);
+            font-size: 1.4rem; cursor: pointer; box-shadow: var(--shadow-out); display: flex; align-items: center; justify-content: center;
+            transition: 0.3s;
+        }
+        .theme-btn:active { box-shadow: var(--shadow-in); transform: scale(0.95); }
+        .brand-badge { font-size: 0.75rem; letter-spacing: 2px; color: var(--accent); font-weight: 900; }
+
+        /* --- Header --- */
+        .title-box { 
+            text-align: center; margin-bottom: 40px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        
+        .typewriter-h1 {
+            font-family: 'Courier New', monospace;
+            font-size: 2rem; font-weight: 900; margin: 0; 
+            color: var(--text-main); 
+            text-shadow: 0 0 10px rgba(0,0,0,0.1);
+            letter-spacing: -1px; display: inline-block;
+        }
+        
+        /* خط نفس‌کش */
+        .pulse-line {
+            width: 120px; height: 3px; background: var(--accent); border-radius: 5px;
+            margin: 10px auto 15px auto;
+            animation: breatheLine 3s infinite ease-in-out;
+        }
+        @keyframes breatheLine {
+            0% { opacity: 0.3; box-shadow: 0 0 2px var(--accent); }
+            50% { opacity: 1; box-shadow: 0 0 25px var(--accent); }
+            100% { opacity: 0.3; box-shadow: 0 0 2px var(--accent); }
+        }
+
+        .subtitle {
+            font-size: 0.8rem; color: var(--text-main); opacity: 0.8;
+            letter-spacing: 2px; font-weight: 300; text-transform: uppercase;
+            animation: fadeIn 2s ease forwards;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 0.8; transform: translateY(0); } }
+
+        .word-nano { color: var(--text-main); }
+        .word-banana { color: var(--accent-sec); transition: color 0.3s; font-weight: 900; }
+
+
+        /* --- Form Inputs (Fix: سایه برجسته برای حالت عادی) --- */
+        .form-grid { display: flex; flex-direction: column; gap: 20px; }
+        label { display: flex; align-items: center; gap: 8px; color: var(--text-main); margin-bottom: 8px; font-size: 0.9rem; font-weight: bold; }
+        label ion-icon { font-size: 1.1rem; color: var(--accent); }
+        
+        input, select { 
+            width: 100%; padding: 15px; background: var(--input-bg); border: none; border-radius: 15px; 
+            color: var(--text-main); font-size: 1rem; outline: none; 
+            /* سایه برجسته برای حالت عادی (Outset) */
+            box-shadow: var(--shadow-out); 
+            transition: 0.3s; 
+        }
+        
+        /* حالت کلیک شده یا تمرکز (Inset) */
+        input:focus, select:focus { 
+            color: var(--accent); 
+            box-shadow: var(--shadow-in); 
+        }
+
+        .generate-btn {
+            width: 100%; padding: 20px; margin-top: 40px; background: var(--bg); color: var(--accent); 
+            font-weight: 900; font-size: 1.1rem; border: none; border-radius: 20px; cursor: pointer; box-shadow: var(--shadow-out);
+            transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .generate-btn:active { box-shadow: var(--shadow-in); transform: scale(0.98); }
+
+        /* Modal */
+        .processing-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100;
+            display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px);
+        }
+        .banana-spinner {
+            font-size: 5rem; margin-bottom: 30px; display: inline-block;
+            animation: nanoSpin 2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+            text-shadow: 0 0 30px var(--accent-sec);
+        }
+        @keyframes nanoSpin { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }
+        .status-text { color: var(--text-main); font-family: 'Vazirmatn'; font-size: 1.2rem; margin-bottom: 10px; font-weight: bold; }
+        .sub-status { color: var(--accent); font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; font-weight: bold;}
+
+        /* Output */
+        .output-section { margin-top: 40px; display: none; width: 100%; }
+        .prompt-card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin-bottom: 35px; box-shadow: var(--shadow-out); border-top: 2px solid transparent; }
+        .manual-card { border-top-color: var(--text-muted); }
+        .ai-card { border-top-color: var(--accent); }
+        .card-title { font-size: 0.85rem; font-weight: bold; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .prompt-text { 
+            color: var(--text-main); font-family: monospace; font-size: 0.9rem; line-height: 1.6; 
+            direction: ltr; text-align: left; min-height: 40px; white-space: pre-wrap; opacity: 0.9; margin-bottom: 15px;
+        }
+        
+        .copy-btn {
+            background: var(--bg); border: none; width: 35px; height: 35px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-out); 
+            cursor: pointer; color: var(--text-main); transition: 0.2s; font-size: 1.1rem;
+        }
+        .copy-btn:active { box-shadow: var(--shadow-in); color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="top-bar">
+            <div class="brand-badge">PRO VERSION</div>
+            <button class="theme-btn" onclick="toggleTheme()">
+                <ion-icon name="moon-outline" id="themeIcon"></ion-icon>
+            </button>
+        </div>
+        
+        <div class="title-box">
+            <h1 class="typewriter-h1">
+                <span id="type-target"></span>
+            </h1>
+            
+            <div class="pulse-line"></div>
+            
+            <div class="subtitle">✨ THE ULTIMATE PROMPT ENGINE</div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group"><label><ion-icon name="person-outline"></ion-icon> سوژه (Subject)</label><input type="text" id="subject" placeholder="مثال: یک شوالیه"></div>
+            <div class="form-group"><label><ion-icon name="flash-outline"></ion-icon> فعالیت (Action)</label><input type="text" id="action" placeholder="مثال: مبارزه با شمشیر"></div>
+            <div class="form-group"><label><ion-icon name="earth-outline"></ion-icon> محیط (Location)</label><input type="text" id="env" placeholder="مثال: قلعه قدیمی"></div>
+            
+            <div class="form-group">
+                <label><ion-icon name="color-palette-outline"></ion-icon> استایل (Style)</label>
+                <select id="style">
+                    <option value="Cinematic, 8k, Hyper-realistic">سینمایی و واقعی</option>
+                    <option value="Anime style, Studio Ghibli">انیمه ژاپنی</option>
+                    <option value="Cyberpunk, Neon, Futuristic">سایبرپانک</option>
+                    <option value="3D Pixar Style, Cute">سه بعدی پیکسار</option>
+                </select>
+            </div>
+            
+            <div class="form-group"><label><ion-icon name="camera-outline"></ion-icon> دوربین (Camera)</label><input type="text" id="camera" placeholder="مثال: Wide angle, f/1.8"></div>
+            <div class="form-group"><label><ion-icon name="eye-off-outline"></ion-icon> حذف شود (Negative)</label><input type="text" id="negative" placeholder="مثال: زشت، تار"></div>
+        </div>
+
+        <button class="generate-btn" id="genBtn" onclick="startProcessing()">
+            <ion-icon name="rocket-outline"></ion-icon> ساخت پرامپت
+        </button>
+
+        <div class="output-section" id="outputSection">
+            <div class="prompt-card manual-card">
+                <div class="card-title"><span><ion-icon name="build-outline"></ion-icon> ساختار استاندارد</span><button class="copy-btn" onclick="copyText('manualPrompt')"><ion-icon name="copy-outline"></ion-icon></button></div>
+                <div class="prompt-text" id="manualPrompt"></div>
+            </div>
+            <div class="prompt-card ai-card">
+                <div class="card-title"><span style="color:var(--accent)"><ion-icon name="diamond-outline"></ion-icon> پیشنهاد هوش مصنوعی</span><button class="copy-btn" onclick="copyText('aiPrompt')"><ion-icon name="copy-outline"></ion-icon></button></div>
+                <div class="prompt-text" id="aiPrompt"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="processing-modal" id="modal">
+        <div class="banana-spinner">🍌</div>
+        <div class="status-text" id="dynamicText">در حال آماده‌سازی...</div>
+        <div class="sub-status">NANO BANANA AI</div>
+    </div>
+
+<script>
+    const API_KEY = "AIzaSyCk0SKnXJhMk7dA-mmvzS40duPchL2nLcg"; 
+    let isDark = true;
+
+    const titleText = "NANO BANANA";
+    const titleElement = document.getElementById('type-target');
+    let titleIndex = 0;
+
+    function typeTitle() {
+        if (titleIndex < titleText.length) {
+            const char = titleText.charAt(titleIndex);
+            
+            let spanClass = "word-nano";
+            if (titleIndex >= 5) spanClass = "word-banana";
+
+            const span = document.createElement('span');
+            span.className = spanClass;
+            span.innerText = char;
+            
+            titleElement.appendChild(span);
+            titleIndex++;
+            setTimeout(typeTitle, 150);
+        }
+    }
+    
+    window.onload = () => {
+        typeTitle();
+        const icon = document.getElementById('themeIcon');
+        icon.setAttribute('name', 'moon-outline');
+    };
+
+    function toggleTheme() {
+        isDark = !isDark;
+        const icon = document.getElementById('themeIcon');
+        if(isDark) {
+            document.body.classList.remove('light-mode');
+            icon.setAttribute('name', 'moon-outline');
+        } else {
+            document.body.classList.add('light-mode');
+            icon.setAttribute('name', 'sunny-outline');
+        }
+    }
+
+    async function startProcessing() {
+        const subject = document.getElementById('subject').value;
+        if (!subject) { alert("لطفا حداقل سوژه را وارد کنید!"); return; }
+
+        const modal = document.getElementById('modal');
+        const dText = document.getElementById('dynamicText');
+        modal.style.display = 'flex';
+        document.getElementById('outputSection').style.display = 'none';
+
+        const phrases = [
+            "در حال ایده پردازی...",
+            "افزایش جزئیات و کیفیت...",
+            "تنظیم نورپردازی...",
+            "ترکیب نهایی...",
+            "تقریباً آماده است!"
+        ];
+
+        for (let i = 0; i < phrases.length; i++) {
+            dText.innerText = phrases[i];
+            await new Promise(r => setTimeout(r, 2500));
+        }
+
+        await generatePrompts();
+        
+        modal.style.display = 'none';
+        document.getElementById('outputSection').style.display = 'block';
+        setTimeout(() => { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }, 100);
+    }
+
+    async function generatePrompts() {
+        const subject = document.getElementById('subject').value;
+        const action = document.getElementById('action').value;
+        const env = document.getElementById('env').value;
+        const style = document.getElementById('style').value;
+        const camera = document.getElementById('camera').value;
+        const negative = document.getElementById('negative').value;
+
+        let manual = `${subject}, ${action}, ${env}, ${style}, ${camera} --ar 16:9 --v 6.0`;
+        if(negative) manual += ` --no ${negative}`;
+        document.getElementById('manualPrompt').innerText = manual;
+
+        try {
+            const modelName = await getActiveModel();
+            const promptReq = {
+                contents: [{
+                    parts: [{
+                        text: `Act as a senior Prompt Engineer. INPUTS: Subject="${subject}", Action="${action}", Env="${env}", Style="${style}", Cam="${camera}", Neg="${negative}" TASK: Create a SOPHISTICATED, highly detailed English prompt for Midjourney/Flux. OUTPUT: JUST THE PROMPT STRING.`
+                    }]
+                }]
+            };
+
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`, {
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(promptReq)
+            });
+
+            const data = await response.json();
+            let aiResult = data.candidates[0].content.parts[0].text.trim();
+            aiResult += " --ar 16:9 --stylize 750 --v 6.0";
+            if(negative) aiResult += ` --no ${negative}`;
+
+            typeWriter('aiPrompt', aiResult, 5);
+
+        } catch (error) {
+            document.getElementById('aiPrompt').innerText = "Error connecting to AI. Please try again.";
+        }
+    }
+
+    function typeWriter(id, text, speed) {
+        let i = 0; const elem = document.getElementById(id); elem.innerText = "";
+        function type() {
+            if (i < text.length) {
+                elem.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            }
+        }
+        type();
+    }
+
+    async function getActiveModel() {
+        try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${API_KEY}`);
+            const data = await res.json();
+            let m = data.models?.find(x => x.name.includes('flash') || x.name.includes('pro'));
+            return m ? m.name.replace('models/', '') : 'gemini-1.5-flash';
+        } catch { return 'gemini-1.5-flash'; }
+    }
+
+    function copyText(id) {
+        const elem = document.getElementById(id);
+        if (!elem) return;
+        const text = elem.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const card = elem.closest('.prompt-card');
+            const btn = card.querySelector('.copy-btn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<ion-icon name="checkmark-done-outline"></ion-icon>';
+            btn.style.color = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.color = '';
+            }, 2000);
+        });
+    }
+    
+    window.copyText = copyText;
+    window.toggleTheme = toggleTheme;
+    window.startProcessing = startProcessing;
+
+</script>
+</body>
+</html>
