@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOOLS AI</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    
+    <style>
+        /* --- متغیرهای رنگی --- */
+        :root {
+            --bg: #121212;
+            --card-bg: #1E1E1E;
+            --input-bg: #252525;
+            --text-main: #E0E0E0;
+            --text-muted: #AAAAAA;
+            --accent: #00BFFF;
+            --gold: #FFD700;
+            --error: #ff0055; /* رنگ خطا */
+            --success: #00ff88; /* رنگ موفقیت */
+            --border: #333333;
+            --radius: 16px;
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+            --input-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        body.light-mode {
+            --bg: #F5F5F5;
+            --card-bg: #FFFFFF;
+            --input-bg: #F0F0F0;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --accent: #6c5ce7;
+            --gold: #ffaa00;
+            --error: #ff4444;
+            --success: #00cc66;
+            --border: #DDDDDD;
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+            --input-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            display: flex; flex-direction: column; align-items: center; 
+            transition: 0.3s ease;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* --- سیستم نوتیفیکیشن (Toast) --- */
+        #notification-area {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 2000; width: 90%; max-width: 400px;
+            display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+        }
+        
+        .toast {
+            background: rgba(30, 30, 30, 0.95);
+            color: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            animation: slideDown 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: auto;
+        }
+        
+        .toast.error { border-right: 5px solid var(--error); }
+        .toast.error ion-icon { color: var(--error); font-size: 1.5rem; }
+        
+        .toast.success { border-right: 5px solid var(--success); }
+        .toast.success ion-icon { color: var(--success); font-size: 1.5rem; }
+        
+        .toast.info { border-right: 5px solid var(--accent); }
+        .toast.info ion-icon { color: var(--accent); font-size: 1.5rem; }
+
+        @keyframes slideDown { from { transform: translateY(-100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { to { transform: translateY(-20px); opacity: 0; } }
+
+        /* --- بقیه استایل‌ها --- */
+        .theme-toggle {
+            position: absolute; top: 20px; left: 20px;
+            width: 45px; height: 45px; border-radius: 50%;
+            background: var(--card-bg); border: 1px solid var(--border);
+            color: var(--text-muted); font-size: 1.3rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.3s; box-shadow: var(--card-shadow); z-index: 100;
+        }
+        .theme-toggle:hover { color: var(--text-main); border-color: var(--text-main); }
+
+        .container { width: 100%; max-width: 600px; padding-bottom: 60px; position: relative; }
+
+        .header {
+            text-align: center; margin-top: 60px; margin-bottom: 40px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .ai-logo-container { width: 80px; height: 80px; position: relative; margin-bottom: 20px; }
+        .ai-orb {
+            width: 100%; height: 100%; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #0066FF);
+            display: flex; align-items: center; justify-content: center;
+            animation: pulseGlow 3s ease-in-out infinite alternate;
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 5px 15px rgba(0, 191, 255, 0.2); }
+            100% { box-shadow: 0 10px 35px rgba(0, 191, 255, 0.6); }
+        }
+        .ai-orb ion-icon { font-size: 2.5rem; color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+        .header h1 { font-size: 2.5rem; font-weight: 900; margin: 0; letter-spacing: 2px; color: var(--text-main); font-family: sans-serif;}
+        .header p { color: var(--text-muted); font-size: 0.95rem; margin-top: 5px; font-weight: 500; }
+
+        .hero-card, .nav-card, .form-container, .result-card {
+            box-shadow: var(--card-shadow);
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: 0.3s;
+        }
+
+        .hero-card {
+            width: 100%; margin-bottom: 25px; padding: 30px;
+            text-align: center; cursor: pointer; position: relative; overflow: hidden;
+            border: 1px solid var(--accent); 
+            background: linear-gradient(135deg, rgba(0, 191, 255, 0.05), var(--card-bg));
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .hero-card:hover { transform: translateY(-5px); box-shadow: 0 10px 40px rgba(0, 191, 255, 0.2); }
+        .hero-card h3 { font-size: 1.3rem; margin: 15px 0 5px; color: var(--accent); font-weight: 900; }
+        .hero-card span { font-size: 0.9rem; color: var(--text-main); }
+        .hero-icon { font-size: 3.5rem; color: var(--accent); margin-bottom: 5px; display: block; filter: drop-shadow(0 0 10px rgba(0, 191, 255, 0.5)); }
+
+        #home-screen { display: flex; flex-direction: column; gap: 0; animation: fadeIn 0.5s ease-out; }
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 400px) { .grid-menu { grid-template-columns: 1fr; } }
+
+        .nav-card {
+            padding: 20px 15px; text-align: center;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;
+        }
+        .nav-card:hover { transform: translateY(-5px); border-color: var(--text-muted); }
+        .nav-card ion-icon { font-size: 2rem; color: var(--text-main); margin-bottom: 5px; }
+        .nav-card h3 { font-size: 0.95rem; margin: 0; color: var(--text-main); font-weight: 700; }
+        .nav-card span { font-size: 0.75rem; color: var(--text-muted); }
+
+        #builder-screen { display: none; width: 100%; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .back-btn {
+            background: transparent; border: none; color: var(--text-muted);
+            font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 5px;
+            margin-bottom: 20px; font-weight: 500; padding: 0;
+        }
+        .back-btn:hover { color: var(--text-main); }
+
+        .form-container { padding: 25px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.85rem; font-weight: bold; }
+        
+        input, textarea, select {
+            width: 100%; padding: 14px; background: var(--input-bg);
+            border: 1px solid transparent; border-radius: 12px;
+            color: var(--text-main); font-size: 0.95rem; outline: none; transition: 0.2s;
+            box-shadow: var(--input-shadow);
+        }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.1); }
+        textarea { resize: vertical; height: 100px; }
+
+        .generate-btn {
+            width: 100%; padding: 16px; background: var(--input-bg); color: var(--text-main); 
+            border: 1px solid var(--border); border-radius: 12px; 
+            font-size: 1rem; font-weight: 800; cursor: pointer; margin-top: 10px; transition: 0.2s;
+            box-shadow: var(--card-shadow);
+        }
+        .generate-btn:hover { background: var(--border); border-color: var(--text-muted); }
+        .generate-btn:active { transform: scale(0.98); }
+
+        .results-area { margin-top: 25px; display: none; }
+        .result-card { padding: 20px; margin-bottom: 20px; position: relative; }
+        .result-title {
+            font-size: 0.8rem; font-weight: bold; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center; color: var(--text-muted);
+        }
+        .manual-res { border-left: 3px solid var(--text-muted); }
+        .ai-res { border-left: 3px solid var(--accent); }
+        
+        .prompt-text {
+            font-family: monospace; direction: ltr; text-align: left; color: var(--text-main);
+            font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; min-height: 20px;
+        }
+        
+        .action-bar { display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 10px; }
+        .action-btn {
+            flex: 1; padding: 8px; border-radius: 8px; 
+            background: transparent; border: 1px solid var(--text-muted);
+            color: var(--text-muted); font-size: 0.8rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s;
+        }
+        .action-btn:hover { color: var(--text-main); border-color: var(--accent); background: rgba(0, 191, 255, 0.05); }
+        .action-btn:active { transform: scale(0.95); }
+
+        #generated-image-box { display: none; text-align: center; margin-top: 20px; }
+        #generated-img { width: 100%; border-radius: 15px; border: 2px solid var(--accent); box-shadow: 0 0 20px rgba(0, 243, 255, 0.2); margin-bottom: 15px; }
+
+        .loader-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 200;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+        .loader-chip {
+            font-size: 4rem; color: var(--accent); margin-bottom: 20px;
+            animation: breath 2s ease-in-out infinite alternate; filter: drop-shadow(0 0 10px var(--accent));
+        }
+        @keyframes breath { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 25px var(--accent)); } }
+        .loader-text { color: var(--text-main); font-size: 1.1rem; font-weight: 500; letter-spacing: 1px; }
+
+    </style>
+</head>
+<body>
+
+    <div id="notification-area"></div>
+
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <ion-icon name="moon-outline" id="themeIcon"></ion-icon>
+    </button>
+
+    <header class="header">
+        <div class="ai-logo-container">
+            <div class="ai-orb">
+                <ion-icon name="hardware-chip-outline"></ion-icon>
+            </div>
+        </div>
+        <h1>TOOLS AI</h1>
+        <p>مرکز تخصصی ابزارهای هوش مصنوعی</p>
+    </header>
+
+    <div class="container">
+        
+        <div id="home-screen">
+            <div class="hero-card" onclick="openBuilder('generator')">
+                <ion-icon name="sparkles-outline" class="hero-icon"></ion-icon>
+                <h3>موتور ساخت تصویر (FLUX)</h3>
+                <span>تبدیل متن به عکس با کیفیت بالا</span>
+            </div>
+
+            <div class="grid-menu">
+                <div class="nav-card" onclick="openBuilder('image')"><ion-icon name="image-outline"></ion-icon><h3>پرامپت تصویر</h3><span>Midjourney</span></div>
+                <div class="nav-card" onclick="openBuilder('youtube')"><ion-icon name="logo-youtube"></ion-icon><h3>ایده پرداز یوتیوب</h3><span>Idea & Script</span></div>
+                <div class="nav-card" onclick="openBuilder('video')"><ion-icon name="videocam-outline"></ion-icon><h3>پرامپت ویدیو</h3><span>AI Video Gen</span></div>
+                <div class="nav-card" onclick="openBuilder('3d')"><ion-icon name="cube-outline"></ion-icon><h3>مدل سه‌بعدی</h3><span>3D Assets</span></div>
+                <div class="nav-card" onclick="openBuilder('voice')"><ion-icon name="mic-outline"></ion-icon><h3>صدا و نریشن</h3><span>Voice AI</span></div>
+            </div>
+        </div>
+
+        <div id="builder-screen">
+            <button class="back-btn" onclick="goHome()">
+                <ion-icon name="arrow-forward-outline"></ion-icon> بازگشت به منو
+            </button>
+
+            <div class="form-container">
+                <h2 id="form-title" style="margin-bottom:20px; color:var(--text-main); font-size:1.1rem;">عنوان فرم</h2>
+                <div id="dynamic-form"></div>
+                <button class="generate-btn" onclick="startGeneration()">شروع پردازش</button>
+            </div>
+
+            <div id="generated-image-box">
+                <img id="generated-img" src="" alt="Generated Image">
+                <button class="generate-btn" onclick="downloadImage()">📥 دانلود تصویر</button>
+            </div>
+
+            <div id="results" class="results-area">
+                <div class="result-card manual-res" id="manual-box">
+                    <div class="result-title">
+                        <span>🍌 ساختار استاندارد</span>
+                        <ion-icon name="copy-outline" class="copy-icon" onclick="copyText('manual-out')"></ion-icon>
+                    </div>
+                    <div class="prompt-text" id="manual-out"></div>
+                    <div class="action-bar">
+                         <button class="action-btn" onclick="copyText('manual-out')"><ion-icon name="copy-outline"></ion-icon> کپی</button>
+                         <button class="action-btn" onclick="testPrompt('manual-out')"><ion-icon name="rocket-outline"></ion-icon> اجرا</button>
+                    </div>
+                </div>
+
+                <div class="result-card ai-res" id="ai-result-card">
+                    <div class="result-title">
+                        <span style="color:var(--accent)" id="ai-title">🤖 پیشنهاد هوشمند جمینای</span>
+                        <ion-icon name="copy-outline" class="copy-icon" onclick="copyText('ai-out')"></ion-icon>
+                    </div>
+                    <div class="prompt-text" id="ai-out"></div>
+                    <div class="action-bar">
+                        <button class="action-btn" onclick="copyText('ai-out')"><ion-icon name="copy-outline"></ion-icon> کپی</button>
+                        <button class="action-btn" id="ai-test-btn" onclick="testPrompt('ai-out')"><ion-icon name="rocket-outline"></ion-icon> اجرا</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="loader-modal" id="loader"><div class="loader-chip"><ion-icon name="hardware-chip"></ion-icon></div><div class="loader-text" id="loader-text">درحال پردازش...</div></div>
+
+<script>
+    const API_KEY = "AIzaSyCk0SKnXJhMk7dA-mmvzS40duPchL2nLcg"; 
+    let currentType = '';
+    let isDark = true;
+
+    function toggleTheme() {
+        isDark = !isDark;
+        const icon = document.getElementById('themeIcon');
+        if(!isDark) { document.body.classList.add('light-mode'); icon.setAttribute('name', 'sunny-outline'); } 
+        else { document.body.classList.remove('light-mode'); icon.setAttribute('name', 'moon-outline'); }
+    }
+
+    // --- سیستم نوتیفیکیشن جدید ---
+    function showToast(message, type = 'info') {
+        const box = document.getElementById('notification-area');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        let iconName = 'information-circle';
+        if(type === 'error') iconName = 'alert-circle';
+        if(type === 'success') iconName = 'checkmark-circle';
+
+        toast.innerHTML = `<ion-icon name="${iconName}"></ion-icon> <span>${message}</span>`;
+        box.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'fadeOut 0.5s ease forwards';
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
+    }
+
+    function openBuilder(type) {
+        currentType = type;
+        document.getElementById('home-screen').style.display = 'none';
+        document.getElementById('builder-screen').style.display = 'block';
+        document.getElementById('results').style.display = 'none';
+        document.getElementById('generated-image-box').style.display = 'none';
+        renderForm(type);
+    }
+
+    function goHome() {
+        document.getElementById('builder-screen').style.display = 'none';
+        document.getElementById('home-screen').style.display = 'grid';
+        document.getElementById('dynamic-form').innerHTML = '';
+    }
+
+    const forms = {
+        generator: `
+            <div class="form-group"><label>توصیف تصویر:</label><textarea id="inp1" placeholder="مثال: کلبه جنگلی..."></textarea></div>
+            <div class="form-group"><label>سبک هنری:</label><select id="inp2"><option>Cinematic</option><option>Anime</option><option>3D Render</option><option>Oil Painting</option></select></div>
+            <div class="form-group"><label>سایز تصویر:</label><select id="inp3"><option value="landscape">16:9 (عریض)</option><option value="portrait">9:16 (استوری)</option><option value="square">1:1 (مربع)</option></select></div>
+        `,
+        image: `
+            <div class="form-group"><label>توصیف تصویر:</label><textarea id="inp1" placeholder="مثال: گربه فضانورد..."></textarea></div>
+            <div class="form-group"><label>استایل:</label><select id="inp2"><option>Photorealistic</option><option>Anime Style</option><option>Concept Art</option><option>3D Render</option></select></div>
+            <div class="form-group"><label>نورپردازی:</label><select id="inp3"><option>Cinematic</option><option>Natural</option><option>Neon</option><option>Studio</option></select></div>
+        `,
+        youtube: `
+            <div class="form-group"><label>موضوع ویدیو:</label><textarea id="inp1" placeholder="مثال: بررسی آیفون 16..."></textarea></div>
+            <div class="form-group"><label>نوع ویدیو:</label><select id="inp2"><option>Tutorial</option><option>Review</option><option>Vlog</option><option>Gaming</option></select></div>
+            <div class="form-group"><label>مخاطب هدف:</label><select id="inp3"><option>Everyone</option><option>Tech Lovers</option><option>Students</option><option>Gamers</option></select></div>
+        `,
+        video: `
+            <div class="form-group"><label>ایده ویدیو:</label><textarea id="inp1" placeholder="مثال: پرواز روی شهر..."></textarea></div>
+            <div class="form-group"><label>سبک:</label><select id="inp2"><option>Cinematic</option><option>Cyberpunk</option><option>Animation</option></select></div>
+            <div class="form-group"><label>دوربین:</label><select id="inp3"><option>Static</option><option>Drone Shot</option><option>Slow Pan</option></select></div>
+        `,
+        '3d': `
+            <div class="form-group"><label>سوژه مدل:</label><input type="text" id="inp1" placeholder="مثال: صندلی"></input></div>
+            <div class="form-group"><label>متریال:</label><select id="inp2"><option>Plastic</option><option>Metal</option><option>Wood</option></select></div>
+            <div class="form-group"><label>موتور:</label><select id="inp3"><option>Unreal Engine 5</option><option>Blender</option></select></div>
+        `,
+        voice: `
+            <div class="form-group"><label>متن نریشن:</label><textarea id="inp1" placeholder="متن..."></textarea></div>
+            <div class="form-group"><label>شخصیت:</label><select id="inp2"><option>Narrator</option><option>Friend</option><option>News Anchor</option></select></div>
+            <div class="form-group"><label>احساس:</label><select id="inp3"><option>Neutral</option><option>Happy</option><option>Sad</option></select></div>
+        `
+    };
+
+    const titles = { 
+        generator: "🎨 موتور ساخت تصویر (FLUX)",
+        image: "🖼️ ساخت پرامپت تصویر",
+        youtube: "▶️ ایده پرداز یوتیوب",
+        video: "🎬 ساخت پرامپت ویدیو", 
+        '3d': "🧊 ساخت پرامپت سه‌بعدی", 
+        voice: "🎙️ ساخت پرامپت صدا" 
+    };
+
+    function renderForm(type) {
+        document.getElementById('form-title').innerText = titles[type];
+        document.getElementById('dynamic-form').innerHTML = forms[type];
+    }
+
+    async function startGeneration() {
+        const inp1 = document.getElementById('inp1').value;
+        const inp2 = document.getElementById('inp2').value;
+        const inp3 = document.getElementById('inp3').value;
+
+        if (!inp1) { 
+            showToast("لطفا فیلد اول را پر کنید!", "error"); 
+            return; 
+        }
+
+        const loader = document.getElementById('loader');
+        const loaderText = document.getElementById('loader-text');
+        loader.style.display = 'flex';
+        
+        const texts = ["دریافت اطلاعات...", "اتصال به مغز هوش مصنوعی...", "پردازش خلاقانه...", "آماده‌سازی نهایی..."];
+        for (let i = 0; i < texts.length; i++) {
+            loaderText.innerText = texts[i];
+            await new Promise(r => setTimeout(r, 800));
+        }
+
+        if (currentType === 'generator') {
+             try {
+                const modelName = await getActiveModel();
+                const promptReq = {
+                    contents: [{ parts: [{ text: `Convert to detailed English image prompt: Input: "${inp1}". Style: ${inp2}. Output ONLY prompt.` }] }]
+                };
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(promptReq)
+                });
+                const data = await response.json();
+                const engPrompt = data.candidates[0].content.parts[0].text.trim();
+
+                let w = 1024, h = 1024;
+                if(inp3 === 'landscape') { w = 1280; h = 720; }
+                else if(inp3 === 'portrait') { w = 720; h = 1280; }
+
+                const seed = Math.floor(Math.random() * 999999);
+                const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(engPrompt)}?model=flux&width=${w}&height=${h}&seed=${seed}&nologo=true`;
+
+                const img = document.getElementById('generated-img');
+                img.src = imgUrl;
+                img.onload = () => {
+                    loader.style.display = 'none';
+                    document.getElementById('generated-image-box').style.display = 'block';
+                    document.getElementById('results').style.display = 'none';
+                    showToast("تصویر با موفقیت ساخته شد!", "success");
+                };
+             } catch (e) { 
+                 showToast("خطا در ساخت تصویر", "error"); 
+                 loader.style.display = 'none'; 
+             }
+             return;
+        }
+
+        let manual = "";
+        let sysPrompt = "";
+
+        // Logic sections (same as before)...
+        if(currentType === 'image') {
+            manual = `Image: ${inp1}, ${inp2}, ${inp3} light.`;
+            sysPrompt = `Act as a pro Prompt Engineer. Create a detailed English prompt for Midjourney. Input: "${inp1}", Style: "${inp2}", Detail: "${inp3}". Output: ONLY the prompt string.`;
+        }
+        else if(currentType === 'youtube') {
+            manual = `Topic: ${inp1}, Type: ${inp2}, Target: ${inp3}`;
+            sysPrompt = `Act as a YouTube Strategist. Generate 5 Clickbait Titles, 1 Thumbnail Idea, and a short Hook Script for a video about "${inp1}". Type: ${inp2}, Audience: ${inp3}. Answer in Persian (Farsi).`;
+        }
+        else if(currentType === 'video') {
+            manual = `Video: ${inp1}, Style: ${inp2}, Cam: ${inp3}`;
+            sysPrompt = `Create detailed prompt for AI Video. Input: ${inp1}, Style: ${inp2}. Output only prompt.`;
+        }
+        else if(currentType === '3d') {
+             manual = `3D: ${inp1}, ${inp2}, ${inp3}`;
+             sysPrompt = `Create 3D prompt for ${inp1}. Material: ${inp2}.`;
+        }
+        else {
+             manual = `Voice: ${inp2}, ${inp3}. Text: "${inp1}"`;
+             sysPrompt = `Voiceover setting suggestion for: "${inp1}". Role: ${inp2}.`;
+        }
+
+        document.getElementById('manual-out').innerText = manual;
+        
+        // ... UI Adjustments for Youtube ...
+        if (currentType === 'youtube') {
+            document.getElementById('manual-box').style.display = 'none';
+            document.getElementById('ai-test-btn').style.display = 'none';
+        } else {
+            document.getElementById('manual-box').style.display = 'block';
+            document.getElementById('ai-test-btn').style.display = 'flex';
+        }
+
+        try {
+            const modelName = await getActiveModel();
+            const promptReq = { contents: [{ parts: [{ text: sysPrompt }] }] };
+
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`, {
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(promptReq)
+            });
+
+            const data = await response.json();
+            let aiResult = data.candidates[0].content.parts[0].text.trim();
+            
+            if (currentType === 'youtube') {
+                aiResult = aiResult.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                document.getElementById('ai-out').innerHTML = aiResult;
+            } else {
+                typeWriter('ai-out', aiResult, 10);
+            }
+            
+            showToast("پردازش کامل شد!", "success");
+
+        } catch (error) {
+            document.getElementById('ai-out').innerText = "خطا در اتصال به هوش مصنوعی.";
+            showToast("خطا در ارتباط با سرور", "error");
+        }
+
+        loader.style.display = 'none';
+        document.getElementById('results').style.display = 'block';
+        setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
+    }
+
+    function typeWriter(id, text, speed) {
+        let i = 0; const elem = document.getElementById(id); elem.innerHTML = ""; 
+        function type() { if (i < text.length) { elem.innerHTML += text.charAt(i); i++; setTimeout(type, speed); } }
+        type();
+    }
+    async function getActiveModel() {
+        try { const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${API_KEY}`); const data = await res.json(); let m = data.models?.find(x => x.name.includes('flash') || x.name.includes('pro')); return m ? m.name.replace('models/', '') : 'gemini-1.5-flash'; } catch { return 'gemini-1.5-flash'; }
+    }
+    
+    function copyText(id) { 
+        const text = document.getElementById(id).innerText; 
+        navigator.clipboard.writeText(text).then(() => showToast("متن کپی شد!", "success")); 
+    }
+
+    function testPrompt(id) {
+        const text = document.getElementById(id).innerText;
+        if(!text) return;
+        navigator.clipboard.writeText(text).then(() => {
+            showToast("کپی شد! در حال انتقال...", "info");
+            let url = "https://www.google.com";
+            if(currentType === 'image') url = "https://app.leonardo.ai/ai-generations";
+            else if(currentType === 'youtube') url = "https://studio.youtube.com/";
+            else if(currentType === 'video') url = "https://runwayml.com/";
+            else if(currentType === '3d') url = "https://csm.ai/";
+            else if(currentType === 'voice') url = "https://elevenlabs.io/";
+            setTimeout(() => window.open(url, '_blank'), 1500);
+        });
+    }
+
+    function downloadImage() {
+        const img = document.getElementById('generated-img');
+        const link = document.createElement('a');
+        link.href = img.src;
+        link.download = 'Nano_Image.jpg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast("دانلود شروع شد", "success");
+    }
+</script>
+
+</body>
+</html>
