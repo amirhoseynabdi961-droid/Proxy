@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOOLS AI: Hoshinoo Edition</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    
+    <style>
+        :root {
+            --bg: #050505; --card: #121212; --inp: #1e1e1e;
+            --text: #e0e0e0; --muted: #888888;
+            --accent: #10a37f;
+            --purple: #8b5cf6; --cyan: #06b6d4;
+            --err: #ef4444; --suc: #10b981; --warn: #f59e0b;
+            --border: #2d2d30; --rad: 18px;
+            --chat-user: #7c3aed; --chat-ai: #27272a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
+        
+        body { 
+            background-color: var(--bg); color: var(--text); 
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; 
+            padding: 20px; overflow-x: hidden; transition: 0.3s;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(16, 163, 127, 0.1), transparent 70%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 50px 50px, 50px 50px;
+            background-attachment: fixed;
+        }
+
+        .container { width: 100%; max-width: 600px; padding-bottom: 80px; }
+        .header { text-align: center; margin: 30px 0 20px; }
+        .orb { width: 60px; height: 60px; margin: 0 auto 10px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #2ecc71); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(16, 163, 127, 0.4); animation: pulse 3s infinite; transition: 0.5s; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .orb ion-icon { font-size: 2rem; color: white; }
+        .header h1 { font-size: 1.8rem; font-weight: 900; margin: 0; letter-spacing: 1px; }
+        .header-subtitle { 
+            font-size: 0.95rem; margin-top: 8px; font-weight: bold;
+            background: linear-gradient(90deg, #fff, var(--cyan), #fff);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+            animation: glowText 3s infinite alternate;
+        }
+        @keyframes glowText { from { text-shadow: 0 0 5px rgba(6, 182, 212, 0.3); opacity: 0.8; } to { text-shadow: 0 0 20px rgba(6, 182, 212, 0.8); opacity: 1; } }
+
+        /* Menu */
+        .hero { background: linear-gradient(135deg, rgba(16, 163, 127, 0.15), var(--card)); border: 1px solid var(--accent); border-radius: var(--rad); padding: 20px; margin-bottom: 20px; text-align: center; cursor: pointer; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .nav-item { background: var(--card); border: 1px solid var(--border); border-radius: var(--rad); padding: 20px 10px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.2s; }
+        .nav-item:active { transform: scale(0.96); background: var(--inp); }
+        .nav-item ion-icon { font-size: 1.8rem; color: var(--text); }
+        .nav-item h3 { font-size: 0.85rem; margin: 0; }
+        
+        /* Screens */
+        .screen { display: none; width: 100%; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .back-btn { background: transparent; border: none; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 5px; margin-bottom: 15px; font-size: 0.9rem; }
+        
+        /* Chat */
+        .chat-container { height: 65vh; display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--border); border-radius: var(--rad); overflow: hidden; }
+        .chat-header-status { font-size: 0.8rem; text-align: center; padding: 10px; background: var(--inp); border-bottom: 1px solid var(--border); display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .model-select { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; outline: none; cursor: pointer; font-weight: bold; width: auto; margin: 0; transition: 0.3s; }
+        .model-select option { background: var(--card); color: var(--text); }
+        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .msg { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 0.95rem; line-height: 1.8; word-wrap: break-word; }
+        .msg.user { align-self: flex-end; background: var(--chat-user); color: #fff; border-bottom-left-radius: 4px; }
+        .msg.ai { align-self: flex-start; background: var(--chat-ai); color: var(--text); border-bottom-right-radius: 4px; border: 1px solid var(--border); }
+        .chat-input-area { padding: 10px; background: var(--inp); display: flex; gap: 10px; align-items: center; border-top: 1px solid var(--border); }
+        .chat-input-area input { margin: 0; border-radius: 25px; padding: 12px 20px; flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--text); outline: none; }
+        .send-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.3s; }
+
+        /* Proxy */
+        .proxy-tabs { display: flex; gap: 10px; background: var(--inp); padding: 5px; border-radius: 16px; margin-bottom: 20px; }
+        .p-tab { flex: 1; padding: 12px; border: none; background: transparent; color: var(--muted); border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .p-tab.active { background: var(--card); color: var(--suc); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .proxy-start-container { display: flex; justify-content: center; align-items: center; height: 300px; }
+        .proxy-start-btn { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--suc), #059669); border: none; color: white; font-size: 1.5rem; cursor: pointer; box-shadow: 0 0 30px rgba(16, 185, 129, 0.4); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; animation: pulse-green 2s infinite; font-weight: bold; }
+        @keyframes pulse-green { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        .config-card { background: var(--inp); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; display: none; }
+        .config-header { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
+        .conf-title { font-weight: bold; color: var(--text); font-size: 1.1rem; direction: ltr; }
+        .conf-meta { display: flex; justify-content: center; gap: 10px; font-size: 0.8rem; }
+        .tag { background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px; }
+        .ping-live { color: var(--suc); animation: blink 1s infinite alternate; font-weight: bold; text-shadow: 0 0 5px var(--suc); }
+        @keyframes blink { from { opacity: 0.6; } to { opacity: 1; } }
+        .code-display { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; font-family: monospace; font-size: 0.75rem; color: var(--suc); height: 80px; overflow-y: auto; text-align: left; direction: ltr; border: 1px dashed var(--border); margin-bottom: 15px; }
+        .proxy-btn { width: 100%; padding: 14px; background: var(--suc); color: #000; border: none; border-radius: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .proxy-next { background: transparent; border: 1px solid var(--border); color: var(--muted); margin-top: 10px; }
+
+        /* Tools & Select Grid */
+        .card-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--rad); padding: 20px; margin-bottom: 20px; }
+        input, textarea, select { width: 100%; padding: 14px; background: var(--inp); border: 1px solid transparent; border-radius: 12px; color: var(--text); font-size: 1rem; outline: none; margin-bottom: 15px; transition: 0.3s; }
+        input:focus { border-color: var(--accent); }
+        label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 0.8rem; }
+        .gen-btn { width: 100%; padding: 16px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-top: 10px; }
+        
+        #text-output { display:none; margin-top:20px; }
+        #ai-result { 
+            white-space: pre-wrap; 
+            line-height: 2; 
+            font-size: 0.95rem; 
+            color: #ececec;
+            text-align: right;
+            padding: 10px;
+        }
+        
+        .select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .select-item { background: var(--inp); border: 1px solid var(--border); padding: 10px; border-radius: 12px; cursor: pointer; text-align: center; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .select-item:hover, .select-item.active { border-color: var(--accent); background: rgba(16, 163, 127, 0.1); }
+        .select-item ion-icon { font-size: 1.5rem; color: var(--muted); }
+        .select-item.active ion-icon { color: var(--accent); }
+        .select-item span { font-size: 0.8rem; color: var(--text); }
+
+        /* Loader */
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .spin { width: 70px; height: 70px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--accent); animation: spin 1.5s linear infinite; position: relative; box-shadow: 0 0 15px rgba(16, 163, 127, 0.2); }
+        .spin::before { content: ""; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--cyan); animation: spin 2.5s linear infinite reverse; }
+        .spin::after { content: ""; position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--purple); animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #222; color: #fff; padding: 12px 20px; border-radius: 30px; font-size: 0.9rem; z-index: 10000; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; transition: 0.3s; pointer-events: none; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(10px); }
+
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="toast"><ion-icon name="information-circle"></ion-icon> <span id="toast-msg">پیام</span></div>
+
+    <header class="header">
+        <div class="orb"><ion-icon name="planet"></ion-icon></div>
+        <h1>TOOLS AI</h1>
+        <p class="header-subtitle">مجموعه ابزار هوش مصنوعی</p>
+    </header>
+
+    <div class="container">
+        
+        <div id="menu" class="screen" style="display: block;">
+            <div class="hero" onclick="loadTool('chat')">
+                <ion-icon name="chatbubbles" style="color:var(--accent); font-size:3rem; margin-bottom:10px;"></ion-icon>
+                <h3 style="color:var(--accent); font-size:1.3rem;">چت آزاد (GPT-5.0)</h3>
+                <span style="font-size:0.8rem; color:var(--text)">مکالمه هوشمند و نامحدود</span>
+            </div>
+
+            <div class="grid">
+                <div class="nav-item" onclick="loadTool('proxy')"><ion-icon name="lock-closed"></ion-icon><h3>فیلترشکن</h3></div>
+                <div class="nav-item" onclick="loadTool('youtube')"><ion-icon name="logo-youtube"></ion-icon><h3>ایده یوتیوب</h3></div>
+                <div class="nav-item" onclick="loadTool('image')"><ion-icon name="image"></ion-icon><h3>پرامپت تصویر</h3></div>
+                <div class="nav-item" onclick="loadTool('video')"><ion-icon name="videocam"></ion-icon><h3>پرامپت ویدیو</h3></div>
+                <div class="nav-item" onclick="loadTool('voice')"><ion-icon name="mic"></ion-icon><h3>پرامپت صدا</h3></div>
+                <div class="nav-item" style="opacity:0.3; cursor:default;"><ion-icon name="add-circle"></ion-icon><h3>...</h3></div>
+            </div>
+        </div>
+
+        <div id="chat-screen" class="screen">
+            <button class="back-btn" onclick="goBack()"><ion-icon name="arrow-forward"></ion-icon> بازگشت</button>
+            <div class="chat-container">
+                <div class="chat-header-status">
+                    <span>مدل:</span>
+                    <select id="chat-model-select" class="model-select" onchange="updateChatTheme()">
+                        <option value="openai/gpt-4o-mini">GPT-5.0 (Turbo)</option>
+                        <option value="google/gemini-2.0-flash-001">Gemini 2.0 (Flash)</option>
+                    </select>
+                </div>
+                <div class="chat-messages" id="chat-box">
+                    <div class="msg ai">من هوش مصنوعی کانال Hoshinoo هستم. چطور میتونم کمکتون بکنم؟</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="پیام..." onkeypress="if(event.key==='Enter') sendChat()">
+                    <button class="send-btn" id="send-btn" onclick="sendChat()"><ion-icon name="send"></ion-icon></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="proxy-screen" class="screen">
+            <button class="back-btn" onclick="goBack()"><ion-icon name="arrow-forward"></ion-icon> بازگشت</button>
+            
+            <div class="proxy-tabs">
+                <button class="p-tab active" id="tab-v2" onclick="switchProxyTab('v2ray')">V2RAY | کانفیگ</button>
+                <button class="p-tab" id="tab-tg" onclick="switchProxyTab('telegram')">PROXY | پروکسی</button>
+            </div>
+
+            <div class="proxy-start-container" id="proxy-start-area">
+                <button class="proxy-start-btn" onclick="startProxy()">
+                    <ion-icon name="power"></ion-icon>
+                    <span>اتصال</span>
+                </button>
+            </div>
+
+            <div class="config-card" id="proxy-card">
+                <div class="config-header">
+                    <div class="conf-title" id="p-title">...</div>
+                    <div class="conf-meta">
+                        <span class="tag" id="p-type">VLESS</span>
+                        <span class="tag ping-live" id="p-ping">ms -- ⚡</span>
+                    </div>
+                </div>
+                <div class="code-display" id="p-code">...</div>
+                
+                <button class="proxy-btn" onclick="copyProxy()"><ion-icon name="copy"></ion-icon> <span id="p-btn-txt">کپی کانفیگ</span></button>
+                <button class="proxy-btn proxy-next" onclick="nextProxy()"><ion-icon name="shuffle"></ion-icon> بعدی</button>
+            </div>
+        </div>
+
+        <div id="builder-screen" class="screen">
+            <button class="back-btn" onclick="goBack()"><ion-icon name="arrow-forward"></ion-icon> بازگشت</button>
+            <div class="card-box">
+                <h2 id="tool-title" style="margin-bottom:20px; text-align:center;"></h2>
+                <div id="form-area"></div>
+                <button class="gen-btn" onclick="runEngine()">شروع پردازش</button>
+            </div>
+            
+            <div id="text-output" class="card-box">
+                <div id="ai-result"></div>
+                <button class="gen-btn" style="background:transparent; border:1px solid var(--muted); margin-top:15px;" onclick="copyTextResult()">کپی متن</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="loader">
+        <div class="spin"></div>
+        <div style="color:white; margin-top:15px;">درحال پردازش...</div>
+    </div>
+
+<script>
+    // --- Configs ---
+    const LIARA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiI2OTNhZmY4N2I5MzNjZWNmMmEyY2MwNTEiLCJ0eXBlIjoiYWlfa2V5IiwiaWF0IjoxNzY1NDc0MTgzfQ.DvrBWRWHr371MB8yHuYfvRrOyDUska_vr_G32Y8oVAE";
+    const LIARA_URL = "https://ai.liara.ir/api/693afc74d829a317c2b1bf3a/v1/chat/completions";
+    
+    // --- Proxy List ---
+    const v2rayList = [
+        {t:"آلمان 🇩🇪 | DE-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@77.81.65.10:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#DE-01"},
+        {t:"روسیه 🇷🇺 | RU-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@147.78.180.10:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#RU-01"},
+        {t:"آمریکا 🇺🇸 | US-05", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@193.202.12.10:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#US-05"},
+        {t:"آمریکا 🇺🇸 | US-03", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@193.56.20.10:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#US-03"},
+        {t:"روسیه 🇷🇺 | RU-01 Alt", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@147.78.180.10:993?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#RU-01-Alt"},
+        {t:"آلمان 🇩🇪 | DE-01 Alt", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@77.81.65.10:993?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#DE-01-Alt"},
+        {t:"آمریکا 🇺🇸 | US-03 Alt", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@193.56.20.10:993?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#US-03-Alt"},
+        {t:"سیشل 🇸🇨 | SC-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@146.19.90.10:993?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#SC-01"},
+        {t:"آمریکا 🇺🇸 | US-05 Alt", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@193.202.12.10:993?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#US-05-Alt"},
+        {t:"امارات 🇦🇪 | AE-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@45.88.13.10:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#AE-01"},
+        {t:"پاکستان 🇵🇰 | PK-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@103.175.79.10:993?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#PK-01"},
+        {t:"هند 🇮🇳 | IN-02", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@213.232.123.10:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#IN-02"},
+        {t:"هند 🇮🇳 | IN-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@5.181.171.10:993?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#IN-01"},
+        {t:"هلند 🇳🇱 | NL-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@45.148.233.10:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#NL-01"},
+        {t:"اوکراین 🇺🇦 | UA-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@91.218.122.10:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#UA-01"},
+        {t:"هلند 🇳🇱 | NL-02", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@155.212.37.10:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#NL-02"},
+        {t:"فرانسه 🇫🇷 | FR-02", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@130.49.77.10:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#FR-02"},
+        {t:"قزاقستان 🇰🇿 | KZ-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@166.1.131.2:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#KZ-01"},
+        {t:"لهستان 🇵🇱 | PL-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@166.1.131.3:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#PL-01"},
+        {t:"فرانسه 🇫🇷 | FR-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@155.212.110.2:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#FR-01"},
+        {t:"هند 🇮🇳 | IN-03", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@155.212.110.3:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#IN-03"},
+        {t:"اسپانیا 🇪🇸 | ES-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@166.1.131.6:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#ES-01"},
+        {t:"ترکیه 🇹🇷 | TR-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@166.1.131.7:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#TR-01"},
+        {t:"انگلیس 🇬🇧 | UK-01", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@166.1.131.8:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#UK-01"},
+        {t:"روسیه 🇷🇺 | RU-02", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@166.1.131.4:443?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#RU-02"},
+        {t:"روسیه 🇷🇺 | RU-02 Alt", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@166.1.131.4:993?security=reality&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#RU-02-Alt"},
+        {t:"قزاقستان 🇰🇿 | KZ-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@166.1.131.2:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=update.microsoft.com#KZ-01-GRPC"},
+        {t:"لهستان 🇵🇱 | PL-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@166.1.131.3:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=www.microsoft.com#PL-01-GRPC"},
+        {t:"اسپانیا 🇪🇸 | ES-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@166.1.131.6:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=www.microsoft.com#ES-01-GRPC"},
+        {t:"روسیه 🇷🇺 | RU-02 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@166.1.131.4:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=update.microsoft.com#RU-02-GRPC"},
+        {t:"انگلیس 🇬🇧 | UK-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@166.1.131.8:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=www.microsoft.com#UK-01-GRPC"},
+        {t:"هند 🇮🇳 | IN-03 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@155.212.110.3:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=www.microsoft.com#IN-03-GRPC"},
+        {t:"ترکیه 🇹🇷 | TR-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@166.1.131.7:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=update.microsoft.com#TR-01-GRPC"},
+        {t:"فرانسه 🇫🇷 | FR-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@155.212.110.2:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=update.microsoft.com#FR-01-GRPC"},
+        {t:"پاکستان 🇵🇰 | PK-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@103.175.79.2:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=update.microsoft.com#PK-01-GRPC"},
+        {t:"سیشل 🇸🇨 | SC-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@146.19.90.2:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=update.microsoft.com#SC-01-GRPC"},
+        {t:"هند 🇮🇳 | IN-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@5.181.171.2:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=www.microsoft.com#IN-01-GRPC"},
+        {t:"آلمان 🇩🇪 | DE-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@77.81.65.10:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=update.microsoft.com#DE-01-GRPC"},
+        {t:"فرانسه 🇫🇷 | FR-02 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@130.49.77.10:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=www.microsoft.com#FR-02-GRPC"},
+        {t:"هلند 🇳🇱 | NL-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@45.148.233.10:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=update.microsoft.com#NL-01-GRPC"},
+        {t:"هلند 🇳🇱 | NL-02 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@155.212.37.10:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=www.microsoft.com#NL-02-GRPC"},
+        {t:"اوکراین 🇺🇦 | UA-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@91.218.122.10:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=www.microsoft.com#UA-01-GRPC"},
+        {t:"امارات 🇦🇪 | AE-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@45.88.13.10:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=update.microsoft.com#AE-01-GRPC"},
+        {t:"هند 🇮🇳 | IN-02 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@213.232.123.10:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=www.microsoft.com#IN-02-GRPC"},
+        {t:"روسیه 🇷🇺 | RU-01 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@147.78.180.10:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=www.microsoft.com#RU-01-GRPC"},
+        {t:"آمریکا 🇺🇸 | US-03 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@193.56.20.10:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=www.microsoft.com#US-03-GRPC"},
+        {t:"آمریکا 🇺🇸 | US-05 (GRPC)", c:"vless://1f02058c-5c9d-04bb-a724-2dd17cc68bc7@193.202.12.10:8443?security=reality&type=grpc&serviceName=TunService&mode=gun&sni=www.microsoft.com#US-05-GRPC"}
+    ];
+    
+    const tgProxyList = [
+        {t:"همراه اول", l:"tg://proxy?server=drum.loginom.info.&port=23&secret=eeNEgYdJvXrFGRMCIMJdCQtY2RueWVrdGFuZXQuY29tZmFyYWthdi5jb212YW4ubmFqdmEuY29tAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},
+        {t:"ایرانسل", l:"tg://proxy?server=45.143.167.111&port=20&secret=c7692d3e633c20b510da620b0c172fd5"},
+        {t:"رایتل", l:"tg://proxy?server=179.61.226.53&port=733&secret=eeNEgYdJvXrFGRMCIMJdCQRueWVrdGFuZXQuY29tZmFyYWthdi5jb212YW4ubmFqdmEuY29tAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}
+    ];
+
+    let state = {
+        currentTool: '',
+        chatHistory: [],
+        proxyMode: 'v2ray',
+        pIndex: 0,
+        pingInterval: null
+    };
+
+    // --- Core Functions ---
+    function toast(msg, type='info') {
+        const t = document.getElementById('toast');
+        const s = document.getElementById('toast-msg');
+        s.innerText = msg;
+        t.style.borderRight = type === 'err' ? '4px solid var(--err)' : '4px solid var(--suc)';
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // Function to load a specific tool/screen
+    window.loadTool = function(key) {
+        state.currentTool = key;
+        
+        // Hide all screens
+        document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+        clearInterval(state.pingInterval); // Stop ping when changing screen
+        
+        if(key === 'chat') {
+            document.getElementById('chat-screen').style.display = 'block';
+            return;
+        }
+        if(key === 'proxy') {
+            document.getElementById('proxy-screen').style.display = 'block';
+            document.getElementById('proxy-start-area').style.display = 'flex';
+            document.getElementById('proxy-card').style.display = 'none';
+            return;
+        }
+
+        // Standard tools
+        document.getElementById('builder-screen').style.display = 'block';
+        const titles = { youtube: "🔴 ایده پرداز یوتیوب", image: "🖼️ پرامپت تصویر", video: "🎬 پرامپت ویدیو", voice: "🎙️ پرامپت صدا" };
+        document.getElementById('tool-title').innerText = titles[key];
+        document.getElementById('text-output').style.display = 'none';
+        
+        let html = '';
+        if(key === 'youtube') html = `
+            <label>موضوع ویدیو:</label>
+            <input id="i1" placeholder="مثال: بررسی آیفون 15 پرومکس">
+            
+            <label>نوع ویدیو:</label>
+            <div class="select-grid" id="type-select">
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Tutorial')"><ion-icon name="school"></ion-icon><span>آموزشی</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Vlog')"><ion-icon name="videocam"></ion-icon><span>ولاگ</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Review')"><ion-icon name="search"></ion-icon><span>بررسی</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Gaming')"><ion-icon name="game-controller"></ion-icon><span>گیمینگ</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'ASMR')"><ion-icon name="mic"></ion-icon><span>ASMR</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Challenge')"><ion-icon name="trophy"></ion-icon><span>چالش</span></div>
+            </div>
+            <input type="hidden" id="i2">
+
+            <label>مخاطب:</label>
+            <div class="select-grid" id="target-select">
+                <div class="select-item" onclick="selectItem(this, 'i3', 'Everyone')"><ion-icon name="people"></ion-icon><span>عمومی</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i3', 'Tech Lovers')"><ion-icon name="laptop"></ion-icon><span>تکنولوژی</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i3', 'Gamers')"><ion-icon name="headset"></ion-icon><span>گیمرها</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i3', 'Students')"><ion-icon name="book"></ion-icon><span>دانش‌آموز</span></div>
+            </div>
+            <input type="hidden" id="i3">
+        `;
+        
+        else if (key === 'image') html = `
+             <label>موضوع تصویر:</label>
+             <input id="i1" placeholder="مثال: دعوای گربه و سگ">
+             
+             <label>سبک هنری:</label>
+             <div class="select-grid">
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Realistic')"><ion-icon name="camera"></ion-icon><span>واقع‌گرایانه</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Anime')"><ion-icon name="color-palette"></ion-icon><span>انیمه</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Cyberpunk')"><ion-icon name="hardware-chip"></ion-icon><span>سایبرپانک</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Oil Painting')"><ion-icon name="brush"></ion-icon><span>رنگ روغن</span></div>
+             </div>
+             <input type="hidden" id="i2">
+
+             <label>محیط:</label>
+             <div class="select-grid">
+                <div class="select-item" onclick="selectItem(this, 'i3', 'Indoor')"><ion-icon name="home"></ion-icon><span>داخل خانه</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i3', 'Nature')"><ion-icon name="leaf"></ion-icon><span>طبیعت</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i3', 'Space')"><ion-icon name="planet"></ion-icon><span>فضا</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i3', 'Studio')"><ion-icon name="aperture"></ion-icon><span>استودیو</span></div>
+             </div>
+             <input type="hidden" id="i3">
+        `;
+
+        else if (key === 'voice') html = `
+             <label>موضوع متن:</label>
+             <input id="i1" placeholder="مثال: معرفی محصول جدید">
+             
+             <label>نوع صدا:</label>
+             <div class="select-grid">
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Male')"><ion-icon name="man"></ion-icon><span>مرد</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Female')"><ion-icon name="woman"></ion-icon><span>زن</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Robot')"><ion-icon name="logo-android"></ion-icon><span>ربات</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Alien')"><ion-icon name="rocket"></ion-icon><span>فضایی</span></div>
+             </div>
+             <input type="hidden" id="i2">
+             <input type="hidden" id="i3" value="Persian">
+        `;
+
+        else if (key === 'video') html = `
+             <label>ایده ویدیو:</label>
+             <input id="i1" placeholder="مثال: پرواز پهپاد بر فراز شهر">
+             
+             <label>سبک:</label>
+             <div class="select-grid">
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Cinematic')"><ion-icon name="film"></ion-icon><span>سینمایی</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Animation')"><ion-icon name="happy"></ion-icon><span>انیمیشن</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Vlog')"><ion-icon name="videocam"></ion-icon><span>ولاگ</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i2', 'Drone')"><ion-icon name="airplane"></ion-icon><span>هلی‌شات</span></div>
+             </div>
+             <input type="hidden" id="i2">
+
+             <label>محیط:</label>
+             <div class="select-grid">
+                <div class="select-item" onclick="selectItem(this, 'i3', 'City')"><ion-icon name="business"></ion-icon><span>شهر</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i3', 'Nature')"><ion-icon name="leaf"></ion-icon><span>طبیعت</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i3', 'Indoor')"><ion-icon name="home"></ion-icon><span>داخلی</span></div>
+                <div class="select-item" onclick="selectItem(this, 'i3', 'Sci-Fi')"><ion-icon name="planet"></ion-icon><span>علمی تخیلی</span></div>
+             </div>
+             <input type="hidden" id="i3">
+        `;
+        
+        document.getElementById('form-area').innerHTML = html;
+    }
+
+    // New Helper for Grid Select
+    window.selectItem = function(el, inputId, value) {
+        document.getElementById(inputId).value = value;
+        el.parentElement.querySelectorAll('.select-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    window.goBack = function() {
+        document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+        document.getElementById('menu').style.display = 'block';
+        clearInterval(state.pingInterval);
+        state.currentTool = '';
+    }
+
+    // --- PROXY LOGIC ---
+    window.startProxy = function() {
+        document.getElementById('proxy-start-area').style.display = 'none';
+        document.getElementById('proxy-card').style.display = 'block';
+        renderProxy();
+        // Start Live Ping Simulation
+        state.pingInterval = setInterval(() => {
+            const ping = Math.floor(Math.random() * (120 - 40) + 40);
+            document.getElementById('p-ping').innerText = `ms ${ping} ⚡`;
+        }, 2000);
+    }
+
+    window.switchProxyTab = function(mode) {
+        state.proxyMode = mode;
+        document.querySelectorAll('.p-tab').forEach(b => b.classList.remove('active'));
+        document.getElementById(mode === 'v2ray' ? 'tab-v2' : 'tab-tg').classList.add('active');
+        state.pIndex = 0;
+        renderProxy();
+    }
+
+    window.nextProxy = function() {
+        const list = state.proxyMode === 'v2ray' ? v2rayList : tgProxyList;
+        state.pIndex = (state.pIndex + 1) % list.length;
+        renderProxy();
+    }
+
+    window.copyProxy = function() {
+        const txt = document.getElementById('p-code').innerText;
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(txt).then(() => toast("کپی شد", "suc"));
+        } else {
+            let textArea = document.createElement("textarea");
+            textArea.value = txt;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            if(state.proxyMode === 'v2ray') toast("کپی شد", "suc");
+            else window.location.href = txt;
+        }
+    }
+
+    function renderProxy() {
+        const list = state.proxyMode === 'v2ray' ? v2rayList : tgProxyList;
+        const item = list[state.pIndex];
+        
+        document.getElementById('p-title').innerText = item.t;
+        document.getElementById('p-type').innerText = state.proxyMode === 'v2ray' ? 'VLESS' : 'MTProto';
+        document.getElementById('p-code').innerText = state.proxyMode === 'v2ray' ? item.c : item.l;
+        document.getElementById('p-btn-txt').innerText = state.proxyMode === 'v2ray' ? 'کپی کانفیگ' : 'اتصال';
+        
+        const ping = Math.floor(Math.random() * (150 - 40) + 40);
+        document.getElementById('p-ping').innerText = `ms ${ping} ⚡`;
+    }
+
+    // --- CHAT LOGIC ---
+    window.sendChat = async function() {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        const model = document.getElementById('chat-model-select').value;
+        
+        if (!text) return;
+
+        const chatBox = document.getElementById('chat-box');
+        chatBox.innerHTML += `<div class="msg user">${text}</div>`;
+        input.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        state.chatHistory.push({ role: "user", content: text });
+
+        const loadingId = "load-" + Date.now();
+        chatBox.innerHTML += `<div class="msg ai" id="${loadingId}">...</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            const reply = await callLiara(state.chatHistory, model);
+            document.getElementById(loadingId).remove();
+            state.chatHistory.push({ role: "assistant", content: reply });
+            
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'msg ai';
+            chatBox.appendChild(msgDiv);
+            typeWriter(msgDiv, reply);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+        } catch (e) {
+            document.getElementById(loadingId).innerText = "خطا در اتصال: " + e.message;
+        }
+    }
+    
+    window.updateChatTheme = function() {
+        const select = document.getElementById('chat-model-select');
+        const btn = document.getElementById('send-btn');
+        if(select.value.includes('gpt')) {
+            document.documentElement.style.setProperty('--accent', '#10a37f');
+            btn.style.background = '#10a37f';
+        } else {
+            document.documentElement.style.setProperty('--accent', '#3b82f6');
+            btn.style.background = '#3b82f6';
+        }
+    }
+
+    // --- TOOLS ENGINE ---
+    window.runEngine = async function() {
+        const i1 = document.getElementById('i1').value;
+        if(!i1) return toast("لطفاً فیلد اول را پر کنید", "err");
+
+        document.getElementById('loader').style.display = 'flex';
+
+        let i2 = document.getElementById('i2') ? document.getElementById('i2').value : "";
+        let i3 = document.getElementById('i3') ? document.getElementById('i3').value : "";
+        
+        // Auto-select defaults
+        if(state.currentTool === 'youtube') {
+            if(!i2) i2 = "Tutorial";
+            if(!i3) i3 = "Everyone";
+        }
+        if(state.currentTool === 'image') {
+            if(!i2) i2 = "Realistic";
+            if(!i3) i3 = "Nature";
+        }
+        if(state.currentTool === 'video') {
+            if(!i2) i2 = "Cinematic";
+            if(!i3) i3 = "City";
+        }
+        if(state.currentTool === 'voice') {
+             if(!i2) i2 = "Male";
+        }
+
+        let sys = `Create prompt for: ${i1}`;
+        const friendMode = "Act as a very close, enthusiastic friend. Use emojis! 😍✨";
+        const outputFormat = "Structure: 1. A short, exciting Persian message about the prompt (e.g., 'اینم پرامپت خفنی که خواستی! 😎'). 2. A separator line '-------------'. 3. The detailed English Prompt (concise, single block).";
+
+        if(state.currentTool === 'youtube') {
+             sys = `Act as YouTube Expert. Persian. Topic: ${i1}, Type: ${i2}, Target: ${i3}. 3 Titles + Hook. (Format output with clear paragraphs and bullet points for readability)`;
+        }
+        else if(state.currentTool === 'image') {
+             sys = `${friendMode} Create a high-detail Midjourney/DALL-E prompt. Topic: ${i1}, Style: ${i2}, Environment: ${i3}. ${outputFormat}`;
+        }
+        else if(state.currentTool === 'video') {
+             sys = `${friendMode} Create a cinematic Video Gen prompt (Runway/Pika). Topic: ${i1}, Style: ${i2}, Environment: ${i3}. ${outputFormat}`;
+        }
+        else if(state.currentTool === 'voice') {
+             sys = `${friendMode} Create a Voiceover Prompt/Script. Topic: ${i1}, Tone: ${i2}. ${outputFormat}`;
+        }
+
+        try {
+            // Use GPT-4o-mini for Tools (Smarter formatting)
+            const reply = await callLiara([{ role: "user", content: sys }], "openai/gpt-4o-mini");
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('text-output').style.display = 'block';
+            
+            const out = document.getElementById('ai-result');
+            if(state.currentTool === 'youtube' || state.currentTool === 'voice') {
+                out.innerHTML = reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+                out.style.direction = 'rtl';
+            } else {
+                out.innerHTML = "";
+                out.style.direction = 'ltr';
+                typeWriter(out, reply);
+            }
+            toast("پاسخ دریافت شد", "suc");
+        } catch(e) {
+            document.getElementById('loader').style.display = 'none';
+            toast(e.message, "err");
+        }
+    }
+
+    // --- LIARA API CALLS ---
+    async function callLiara(messages, model) {
+        try {
+            const res = await fetch(LIARA_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${LIARA_KEY}` },
+                body: JSON.stringify({ model: model, messages: messages })
+            });
+            if (!res.ok) {
+                if(res.status === 400) throw new Error("فرمت پیام اشتباه است (400)");
+                if(res.status === 401) throw new Error("کلید نامعتبر است (401)");
+                throw new Error("خطای سرور: " + res.status);
+            }
+            const data = await res.json();
+            return data.choices[0].message.content;
+        } catch (e) {
+            console.error(e);
+            throw e;
+        }
+    }
+
+    // --- Helpers ---
+    function typeWriter(el, text) {
+        let i = 0;
+        const speed = 10;
+        function type() {
+            if (i < text.length) {
+                el.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            }
+        }
+        type();
+    }
+
+    window.copyTextResult = function() {
+        navigator.clipboard.writeText(document.getElementById('ai-result').innerText);
+        toast("کپی شد", "suc");
+    }
+
+    window.toggleTheme = function() { document.body.classList.toggle('light-mode'); }
+
+    // Make functions global for onclick
+    window.startProxy = startProxy;
+    window.switchProxyTab = switchProxyTab;
+    window.nextProxy = nextProxy;
+    window.copyProxy = copyProxy;
+    window.goBack = goBack;
+    window.sendChat = sendChat;
+    window.runEngine = runEngine;
+    window.updateChatTheme = updateChatTheme;
+    window.selectItem = selectItem;
+
+</script>
+</body>
+</html>
