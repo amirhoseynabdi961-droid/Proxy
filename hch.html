@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VIP STREAM | پلتفرم اختصاصی</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-surface: rgba(20, 20, 20, 0.65);
+            --accent: #e50914; 
+            --accent-dark: #b20710;
+            --accent-glow: rgba(229, 9, 20, 0.4);
+            --text-main: #ffffff;
+            --text-muted: #a3a3a3;
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --radius: 16px;
+            --font-family: 'Vazirmatn', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background-color: var(--bg-deep); color: var(--text-main); 
+            min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; user-select: none;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(229, 9, 20, 0.06), transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(40, 40, 40, 0.4), transparent 45%),
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+            background-attachment: fixed;
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 5px var(--accent-glow); } 50% { box-shadow: 0 0 25px var(--accent-glow); } 100% { box-shadow: 0 0 5px var(--accent-glow); } }
+        @keyframes bgMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px) translateX(-50%); } to { opacity: 1; transform: translateY(0) translateX(-50%); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes diamondBreath {
+            0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(229, 9, 20, 0.4)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(229, 9, 20, 0.8)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(229, 9, 20, 0.4)); }
+        }
+
+        /* --- Utility --- */
+        .hidden { display: none !important; }
+
+        /* --- Buttons --- */
+        .btn {
+            background: rgba(255,255,255,0.03); color: var(--text-main); border: 1px solid var(--border-glass);
+            padding: 12px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+        }
+        .btn:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); transform: translateY(-2px); }
+        .btn:active { transform: scale(0.98); }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark)); 
+            border: none; color: white; box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
+        }
+        .btn-primary:hover { box-shadow: 0 6px 25px rgba(229, 9, 20, 0.5); background: linear-gradient(135deg, #ff1e29, #d00000); }
+        
+        .btn-danger { background: rgba(255, 0, 0, 0.15); color: #ff6b6b; border-color: rgba(255, 60, 60, 0.3); }
+        .btn-danger:hover { background: rgba(255, 0, 0, 0.25); border-color: #ff6b6b; }
+
+        /* --- Inputs --- */
+        .vip-input {
+            width: 100%; padding: 14px; background: rgba(0,0,0,0.4); border: 1px solid var(--border-glass);
+            color: white; border-radius: 14px; font-size: 1rem; transition: 0.3s; outline: none;
+        }
+        .vip-input:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); background: rgba(0,0,0,0.6); }
+
+        /* --- 1. LOGIN VIEW --- */
+        #view-login { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh;
+            background: linear-gradient(-45deg, #050505, #150505, #0a0a0a); background-size: 400% 400%; animation: bgMove 15s ease infinite;
+        }
+        .login-card {
+            background: rgba(20, 20, 20, 0.6); padding: 45px 35px; border-radius: 28px;
+            width: 90%; max-width: 400px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px); box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); position: relative; overflow: hidden;
+        }
+        .login-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+        .vip-diamond { width: 70px; height: 70px; color: var(--accent); animation: diamondBreath 4s ease-in-out infinite; margin-bottom: 25px; display: inline-block; }
+        .error-badge {
+            background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220, 38, 38, 0.4); color: #ff8888;
+            padding: 12px; border-radius: 12px; font-size: 0.85rem; margin-top: 20px; display: none;
+            align-items: center; justify-content: center; gap: 8px; animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- 2. USER DASHBOARD --- */
+        header { 
+            background: rgba(10, 10, 10, 0.85); padding: 15px 30px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-glass);
+            backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* 🔥 BRANDED HEADER LOGO (UPDATED) 🔥 */
+        .logo { 
+            font-size: 1.7rem; /* کمی بزرگتر */
+            font-weight: 800; /* بولد و قدرتمند */
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            letter-spacing: 0.5px; /* فاصله حروف حرفه‌ای */
+            /* گرادیان لوکس: قرمز به نارنجی تیره */
+            background: linear-gradient(135deg, #ff1e1e 20%, #ff5e00 100%);
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            /* سایه نوری نرم */
+            filter: drop-shadow(0 2px 10px rgba(229, 9, 20, 0.3));
+        }
+        
+        .logo ion-icon { 
+            font-size: 2.2rem; 
+            color: #ff1e1e; /* رنگ پایه آیکن */
+            /* آیکن هم باید رنگش پر باشه چون تکست فیل ترنسپرنت روی اون اثر نمیذاره */
+            -webkit-text-fill-color: #ff1e1e; 
+            filter: drop-shadow(0 0 5px rgba(255, 30, 30, 0.5)); 
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px 25px; }
+        
+        /* Section Header */
+        .section-header { display: flex; align-items: center; margin-top: 35px; margin-bottom: 30px; border-right: 3px solid var(--accent); padding-right: 15px; }
+        .section-title { font-size: 1.15rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; line-height: 1; }
+
+        /* Grid Layout */
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+
+        /* User Video Card */
+        .video-card-user { 
+            background: var(--bg-surface); border-radius: 20px; overflow: hidden; position: relative; 
+            border: 1px solid var(--border-glass); 
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            animation: fadeInUp 0.6s ease backwards; backdrop-filter: blur(10px);
+            display: flex; flex-direction: column;
+        }
+        .video-card-user:hover { 
+            transform: translateY(-8px); border-color: rgba(229, 9, 20, 0.4); 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 20px rgba(229, 9, 20, 0.1);
+            z-index: 5;
+        }
+        .user-poster-wrapper { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .user-poster { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; background: #111; display: flex; justify-content: center; align-items: center; color: #333; }
+        .video-card-user:hover .user-poster { transform: scale(1.05); }
+        
+        .glass-play-btn {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
+            width: 60px; height: 60px; background: rgba(255,255,255,0.1);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; color: white; backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; opacity: 0.9;
+        }
+        .video-card-user:hover .glass-play-btn { transform: translate(-50%, -50%) scale(1.1); background: var(--accent); border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+        
+        .duration-badge { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 3px 8px; border-radius: 6px; font-size: 0.7rem; color: #fff; font-weight: bold; border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(4px); }
+        
+        .user-card-info { padding: 20px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .user-card-title { font-weight: 800; font-size: 1.05rem; color: #fff; margin-bottom: 8px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .user-card-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .vip-tag { background: linear-gradient(45deg, #b20710, #ff1e1e); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; box-shadow: 0 2px 10px rgba(229, 9, 20, 0.3); }
+        .cat-tag { color: var(--text-muted); font-size: 0.8rem; display: flex; align-items: center; gap: 5px; }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 60px 20px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass); 
+            border-radius: 20px; text-align: center; margin-top: 20px;
+        }
+        .empty-icon { font-size: 3rem; color: var(--text-muted); margin-bottom: 20px; opacity: 0.5; }
+        .empty-text-title { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+        .empty-text-desc { font-size: 0.9rem; color: var(--text-muted); }
+
+        /* --- 4. ADMIN STYLES (PRESERVED) --- */
+        .admin-header { padding: 20px 30px; background: rgba(10, 10, 10, 0.9); border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(15px); }
+        .admin-tabs { display: flex; gap: 15px; padding: 15px 30px; overflow-x: auto; background: rgba(5,5,5,0.8); border-bottom: 1px solid var(--border-glass); }
+        .tab-btn { background: transparent; color: var(--text-muted); padding: 10px 20px; border-radius: 30px; border: 1px solid transparent; cursor: pointer; transition: 0.3s; white-space: nowrap; font-size: 0.95rem; }
+        .tab-btn.active { background: rgba(229, 9, 20, 0.1); color: var(--accent); border-color: rgba(229, 9, 20, 0.3); font-weight: 800; box-shadow: 0 0 15px rgba(229, 9, 20, 0.1); }
+        .admin-card { background: var(--bg-surface); border: 1px solid var(--border-glass); border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .data-item { background: rgba(255,255,255,0.03); padding: 18px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border: 1px solid var(--border-glass); transition: 0.2s; }
+        .video-form { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .video-type-switch { display: flex; gap: 10px; margin-bottom: 10px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 14px; }
+        .type-option { flex: 1; padding: 10px; text-align: center; border-radius: 10px; cursor: pointer; color: var(--text-muted); font-size: 0.9rem; transition: 0.3s; }
+        .type-option.selected { background: var(--bg-surface); color: white; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        
+        /* Admin Search */
+        .search-box { display: flex; gap: 10px; background: var(--bg-surface); border: 1px solid var(--border-glass); padding: 8px 15px; border-radius: 12px; align-items: center; width: 100%; transition: 0.3s; }
+        .search-input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 0.95rem; }
+        .admin-actions { display: flex; gap: 10px; justify-content: space-between; align-items: center; }
+
+        /* --- Modals & Player --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 2000; display: none; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(15px); animation: fadeInUp 0.3s ease; }
+        .video-box { width: 100%; max-width: 1200px; box-shadow: 0 0 150px rgba(229, 9, 20, 0.2); border-radius: 24px; overflow: hidden; }
+        .close-player { position: absolute; top: 30px; right: 30px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; z-index: 2001; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .close-player:hover { background: var(--accent); border-color: var(--accent); }
+        .prompt-box { background: #121212; padding: 40px; border-radius: 24px; width: 90%; max-width: 450px; border: 1px solid var(--border-glass); text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,0.8); }
+        .prompt-input { width: 100%; padding: 16px; background: #080808; border: 1px solid #333; color: #fff; border-radius: 14px; margin-bottom: 20px; outline: none; font-size: 1.1rem; transition: 0.3s; }
+        .prompt-input:focus { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+        .prompt-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        
+        /* Toast & Loader */
+        .toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: rgba(20, 20, 20, 0.95); color: white; padding: 14px 25px; border-radius: 50px; box-shadow: 0 15px 50px rgba(0,0,0,0.7); border: 1px solid var(--border-glass); display: flex; align-items: center; gap: 12px; font-size: 0.95rem; backdrop-filter: blur(10px); animation: slideUpFade 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto; }
+        .loader-container { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index: 3000; display: none; justify-content: center; align-items: center; flex-direction: column; gap: 20px; }
+        .spinner { width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        #hidden-file { display: none; }
+
+        /* Security Overlay */
+        #secure-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background:#000; z-index:99; display:none; justify-content:center; align-items:center; flex-direction:column; }
+        #watermark { position:absolute; color:rgba(255,255,255,0.15); font-size:1.5rem; font-weight:bold; z-index:50; pointer-events:none; }
+
+        /* Context Menu */
+        .context-menu { position: fixed; background: rgba(30, 30, 30, 0.95); border: 1px solid var(--border-glass); border-radius: 12px; padding: 8px 0; min-width: 180px; display: none; flex-direction: column; z-index: 9999; box-shadow: 0 10px 40px rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
+        .ctx-item { padding: 10px 20px; color: #eee; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; transition: 0.2s; text-decoration: none; }
+        .ctx-item:hover { background: var(--accent); color: white; }
+
+        /* Admin Delete Btn */
+        .admin-delete-btn { position: absolute; top: 10px; right: 10px; background: rgba(220, 38, 38, 0.9); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; opacity: 0; transition: 0.3s; }
+        .card:hover .admin-delete-btn { opacity: 1; }
+
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <div id="view-login" class="view">
+        <div class="login-card">
+            <div style="margin-bottom: 25px;">
+                <svg class="vip-diamond" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12.0002 22L2.36015 9.17296C2.06253 8.77697 2.34571 8.20996 2.8412 8.20996H21.1592C21.6547 8.20996 21.9379 8.77697 21.6403 9.17296L12.0002 22Z" fill-opacity="0.8"/>
+                    <path d="M17.81 4.38L12 2.12L6.19 4.38L2.55 8.79L12 22L21.45 8.79L17.81 4.38Z" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+                </svg>
+            </div>
+            <h2 style="margin-bottom: 10px; font-weight: 800;">VIP MEMBER</h2>
+            <p style="color:var(--text-muted); margin-bottom: 30px; font-size: 0.95rem;">کد دسترسی اختصاصی را وارد کنید</p>
+            <input type="text" id="access-code" class="vip-input" placeholder="VIP-XXXX" autocomplete="off" style="text-align: center; letter-spacing: 4px; font-weight: bold; font-family: monospace; font-size: 1.2rem;">
+            <button id="login-btn" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 15px;" onclick="Auth.login()">
+                <span class="btn-text">ورود به پنل</span>
+                <ion-icon name="arrow-back" class="btn-icon"></ion-icon>
+            </button>
+            <div id="login-error" class="error-badge"><ion-icon name="alert-circle"></ion-icon> <span id="error-text"></span></div>
+            <div style="margin-top: 40px;">
+                <button class="btn" style="font-size: 0.85rem; background: transparent; border: none; opacity: 0.6; color: var(--text-muted);" onclick="UI.showAdminLogin()">
+                    <ion-icon name="settings-outline"></ion-icon> مدیریت سیستم
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-dashboard" class="view hidden">
+        <header>
+            <div class="logo"><ion-icon name="infinite"></ion-icon> Hooshino AI</div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div style="font-size: 0.9rem; color: var(--text-muted);">خوش آمدید <span style="color:white; font-weight:bold;" id="user-name-display"></span></div>
+                <button class="btn btn-danger" style="padding: 8px 16px;" onclick="Auth.logout()"><ion-icon name="log-out-outline"></ion-icon></button>
+            </div>
+        </header>
+        
+        <div class="container">
+            <div class="section-header">
+                <div class="section-title">آرشیو ویدیوها</div>
+            </div>
+            <div class="video-grid" id="user-video-list"></div>
+        </div>
+    </div>
+
+    <div id="view-player" class="view hidden">
+        <div class="modal-overlay" style="display:flex;">
+            <button class="close-player" onclick="UI.closePlayer()"><ion-icon name="arrow-forward"></ion-icon> بازگشت</button>
+            <div class="video-box">
+                <div id="secure-overlay"><ion-icon name="eye-off" style="font-size:4rem; color:var(--accent); margin-bottom:20px;"></ion-icon><h3>ضبط صفحه غیرمجاز است</h3></div>
+                <div id="watermark"></div>
+                <video id="player" playsinline controls style="width:100%; aspect-ratio:16/9;"></video>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-admin" class="view hidden">
+        <div class="admin-header">
+            <div style="font-weight: 900; color: white; font-size: 1.3rem;"><ion-icon name="settings" style="color:var(--accent)"></ion-icon> پنل مدیریت</div>
+            <button class="btn btn-danger" onclick="UI.logoutAdmin()"><ion-icon name="power"></ion-icon> خروج</button>
+        </div>
+        <div class="admin-tabs">
+            <div class="tab-btn active" onclick="Admin.switchTab('users')">کاربران & کدها</div>
+            <div class="tab-btn" onclick="Admin.switchTab('videos')">مدیریت ویدیوها</div>
+        </div>
+        <div class="container" style="padding-top: 30px;">
+            <div id="tab-users" class="admin-tab-content">
+                <div class="admin-card">
+                    <h3><ion-icon name="person-add"></ion-icon> ساخت کد دسترسی جدید</h3>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <input type="text" id="new-user-name" class="vip-input" style="flex: 1; min-width: 180px;" placeholder="نام کاربر">
+                        <select id="new-user-expiry" class="vip-input" style="flex: 1; min-width: 140px;">
+                            <option value="7">7 روزه</option>
+                            <option value="30">30 روزه</option>
+                            <option value="9999">دائمی</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="Admin.createUser()">تولید کد</button>
+                    </div>
+                </div>
+                <div class="data-list" id="admin-user-list"></div>
+            </div>
+            <div id="tab-videos" class="admin-tab-content hidden">
+                <div class="admin-card">
+                    <h3><ion-icon name="cloud-upload"></ion-icon> افزودن ویدیو جدید</h3>
+                    <div class="video-form">
+                        <input type="text" id="v-title" class="vip-input" placeholder="عنوان ویدیو">
+                        <input type="text" id="v-desc" class="vip-input" placeholder="توضیح کوتاه">
+                        <div style="display: flex; gap: 15px;">
+                            <input type="text" id="v-cat" class="vip-input" placeholder="دسته‌بندی (مثلاً: اکشن)" style="flex:1;">
+                            <select id="v-status" class="vip-input" style="flex:1;"><option value="active">فعال</option><option value="inactive">غیرفعال</option></select>
+                        </div>
+                        <div class="video-type-switch">
+                            <div class="type-option selected" id="opt-link" onclick="Admin.setVideoSource('link')">لینک مستقیم</div>
+                            <div class="type-option" id="opt-file" onclick="Admin.setVideoSource('file')">آپلود از گالری</div>
+                        </div>
+                        <div id="source-link-container"><input type="text" id="v-url" class="vip-input" placeholder="https://..." style="direction: ltr;"></div>
+                        <div id="source-file-container" class="hidden">
+                            <input type="file" id="v-file" class="vip-input" accept="video/*, .mkv, .mp4">
+                            <p style="font-size: 0.85rem; color: var(--accent); margin-top: 8px;">* فایل‌های لوکال فقط روی همین دستگاه قابل پخش هستند.</p>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="Admin.addVideo()">ثبت در آرشیو</button>
+                    </div>
+                </div>
+                <div class="admin-header" style="background:transparent; padding:0; border:none; margin-bottom:15px;">
+                    <div class="search-box">
+                        <ion-icon name="search" style="color:var(--text-muted)"></ion-icon>
+                        <input type="text" id="search-input" class="search-input" placeholder="جستجو..." onkeyup="Admin.renderVideos()">
+                    </div>
+                </div>
+                <div class="data-list" id="admin-video-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="login-modal" style="z-index: 3000;">
+        <div class="prompt-box">
+            <h3 style="margin-bottom: 25px; color: #fff;">ورود مدیریت</h3>
+            <input type="password" id="admin-pass" class="prompt-input" placeholder="••••" style="text-align:center; letter-spacing:5px;">
+            <button class="prompt-btn btn-primary" style="width:100%; background:var(--accent); color:white; border:none;" onclick="checkLogin()">تایید</button>
+            <button class="prompt-btn" style="width:100%; margin-top:10px; background:transparent; color:#888; border:1px solid rgba(255,255,255,0.1);" onclick="hideLoginModal()">لغو</button>
+        </div>
+    </div>
+    
+    <div class="loader-container" id="loader"><div class="spinner"></div><div style="color: #ccc; font-size: 1rem; font-weight: 600;">در حال پردازش...</div></div>
+    
+    <input type="file" id="hidden-file" accept="video/*"> <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+<script>
+    // ==========================================
+    // 🟢 CONFIG
+    // ==========================================
+    const ADMIN_PASS = "8891";
+    let plyrInstance, pendingVideoFile = null, watermarkInterval;
+
+    const DB = {
+        init: () => {
+            if(!localStorage.getItem('vip_users')) {
+                localStorage.setItem('vip_users', JSON.stringify([{ code: 'VIP-TEST', name: 'کاربر تستی', expiry: Date.now() + 864000000, deviceId: null, blocked: false }]));
+            }
+            if(!localStorage.getItem('vip_videos')) {
+                // Empty initial state to show "Empty State" design
+                localStorage.setItem('vip_videos', JSON.stringify([]));
+            }
+        },
+        getUsers: () => JSON.parse(localStorage.getItem('vip_users')),
+        saveUsers: (data) => localStorage.setItem('vip_users', JSON.stringify(data)),
+        getVideos: () => JSON.parse(localStorage.getItem('vip_videos')),
+        saveVideos: (data) => localStorage.setItem('vip_videos', JSON.stringify(data))
+    };
+
+    // ==========================================
+    // 🔐 AUTH LOGIC
+    // ==========================================
+    const Auth = {
+        currentUser: null,
+        login: () => {
+            const btn = document.getElementById('login-btn');
+            const code = document.getElementById('access-code').value.trim();
+            btn.innerHTML = '<div style="width:20px; height:20px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; animation:spin 1s linear infinite;"></div> در حال بررسی...';
+            setTimeout(() => {
+                const users = DB.getUsers();
+                const user = users.find(u => u.code === code);
+                if (!user || user.blocked || Date.now() > user.expiry) {
+                    UI.showLoginError("کد نامعتبر، مسدود یا منقضی است");
+                    btn.innerHTML = '<span class="btn-text">ورود به پنل</span><ion-icon name="arrow-back" class="btn-icon"></ion-icon>';
+                    return;
+                }
+                // Device Lock
+                const deviceId = localStorage.getItem('device_id') || Math.random().toString(36).substring(7);
+                localStorage.setItem('device_id', deviceId);
+                if (user.deviceId && user.deviceId !== deviceId) {
+                    UI.showLoginError("کد روی دستگاه دیگری فعال است");
+                    btn.innerHTML = '<span class="btn-text">ورود به پنل</span><ion-icon name="arrow-back" class="btn-icon"></ion-icon>';
+                    return;
+                }
+                if (!user.deviceId) { user.deviceId = deviceId; DB.saveUsers(users); }
+                
+                Auth.currentUser = user;
+                document.getElementById('user-name-display').innerText = user.name;
+                UI.showToast(`خوش آمدید ${user.name}`, 'success');
+                UI.showDashboard();
+                btn.innerHTML = 'ورود به پنل';
+                document.getElementById('access-code').value = '';
+                document.getElementById('login-error').style.display = 'none';
+            }, 800);
+        },
+        logout: () => { Auth.currentUser = null; UI.showLogin(); }
+    };
+
+    // ==========================================
+    // ⚙️ ADMIN LOGIC
+    // ==========================================
+    const Admin = {
+        currentSourceMode: 'link',
+        switchTab: (tabName) => {
+            document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            if(tabName === 'users') Admin.renderUsers();
+            if(tabName === 'videos') Admin.renderVideos();
+        },
+        createUser: () => {
+            const name = document.getElementById('new-user-name').value.trim();
+            const days = parseInt(document.getElementById('new-user-expiry').value);
+            if(!name) return UI.showToast("نام کاربر الزامی است", 'error');
+            const code = 'VIP-' + Math.floor(1000 + Math.random() * 9000);
+            const users = DB.getUsers();
+            users.push({ code, name, expiry: Date.now() + (days * 24 * 60 * 60 * 1000), deviceId: null, blocked: false });
+            DB.saveUsers(users);
+            Admin.renderUsers();
+            document.getElementById('new-user-name').value = '';
+            UI.showToast(`کد ${code} ساخته شد`, 'success');
+        },
+        toggleBlock: (code) => {
+            const users = DB.getUsers();
+            const user = users.find(u => u.code === code);
+            if(user) { user.blocked = !user.blocked; DB.saveUsers(users); Admin.renderUsers(); }
+        },
+        deleteUser: (code) => {
+            if(!confirm("آیا مطمئن هستید؟")) return;
+            let users = DB.getUsers().filter(u => u.code !== code);
+            DB.saveUsers(users); Admin.renderUsers(); UI.showToast("کاربر حذف شد", 'error');
+        },
+        renderUsers: () => {
+            const list = document.getElementById('admin-user-list');
+            list.innerHTML = '';
+            DB.getUsers().forEach(u => {
+                const daysLeft = Math.ceil((u.expiry - Date.now()) / (1000 * 60 * 60 * 24));
+                const badge = u.blocked ? '<span class="badge blocked">مسدود</span>' : (daysLeft > 0 ? '<span class="badge active">فعال</span>' : '<span class="badge blocked">منقضی</span>');
+                list.innerHTML += `<div class="data-item"><div class="data-info"><div style="font-weight:bold; color:white;">${u.name}</div><div class="data-meta"><span style="font-family:monospace; color:var(--accent);">${u.code}</span><span>${daysLeft > 9000 ? 'دائمی' : daysLeft + ' روز'}</span>${badge}</div></div><div style="display:flex; gap:8px;"><button class="btn btn-danger" style="padding:8px 14px;" onclick="Admin.deleteUser('${u.code}')"><ion-icon name="trash"></ion-icon></button><button class="btn" style="padding:8px 14px;" onclick="Admin.toggleBlock('${u.code}')"><ion-icon name="${u.blocked ? 'lock-open' : 'lock-closed'}"></ion-icon></button></div></div>`;
+            });
+        },
+        // Video
+        setVideoSource: (mode) => {
+            Admin.currentSourceMode = mode;
+            document.querySelectorAll('.type-option').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`opt-${mode}`).classList.add('selected');
+            document.getElementById('source-link-container').classList.toggle('hidden', mode !== 'link');
+            document.getElementById('source-file-container').classList.toggle('hidden', mode !== 'file');
+        },
+        addVideo: () => {
+            const title = document.getElementById('v-title').value.trim();
+            const desc = document.getElementById('v-desc').value.trim();
+            const cat = document.getElementById('v-cat').value.trim() || 'عمومی';
+            const status = document.getElementById('v-status').value;
+            let url = '';
+            if(!title) return UI.showToast("عنوان الزامی است", 'error');
+            
+            if (Admin.currentSourceMode === 'link') {
+                url = document.getElementById('v-url').value.trim();
+                if(!url) return UI.showToast("لینک الزامی است", 'error');
+                saveVideo(title, desc, cat, status, url, 'link');
+            } else {
+                if(!pendingVideoFile) return UI.showToast("فایل انتخاب نشده", 'error');
+                try {
+                    url = URL.createObjectURL(pendingVideoFile);
+                    saveVideo(title, desc, cat, status, url, 'local');
+                } catch(e) { UI.showToast("خطا در پردازش فایل", 'error'); }
+            }
+        },
+        deleteVideo: (id) => {
+            if(!confirm("حذف ویدیو؟")) return;
+            let videos = DB.getVideos();
+            const video = videos.find(v => v.id === id);
+            if(video && video.type === 'local') URL.revokeObjectURL(video.url);
+            videos = videos.filter(v => v.id !== id);
+            DB.saveVideos(videos); Admin.renderVideos(); UI.showToast("ویدیو حذف شد", 'error');
+        },
+        toggleVideoStatus: (id) => {
+            let videos = DB.getVideos();
+            const v = videos.find(v => v.id === id);
+            if(v) { v.active = !v.active; DB.saveVideos(videos); Admin.renderVideos(); }
+        },
+        renderVideos: () => {
+            const list = document.getElementById('admin-video-list');
+            const query = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
+            list.innerHTML = '';
+            DB.getVideos().filter(m => m.title.toLowerCase().includes(query)).forEach(v => {
+                const statusColor = v.active ? '#4ade80' : '#ff6b6b';
+                list.innerHTML += `<div class="data-item"><div class="data-info"><div style="font-weight:bold; color:white;">${v.title}</div><div class="data-meta"><span>${v.category}</span><span style="color:${statusColor}">● ${v.active ? 'فعال' : 'غیرفعال'}</span><span class="badge type">${v.type === 'local' ? 'فایل' : 'لینک'}</span></div></div><div style="display:flex; gap:8px;"><button class="btn btn-danger" style="padding:8px 14px;" onclick="Admin.deleteVideo(${v.id})"><ion-icon name="trash"></ion-icon></button><button class="btn" style="padding:8px 14px;" onclick="Admin.toggleVideoStatus(${v.id})"><ion-icon name="${v.active ? 'eye' : 'eye-off'}"></ion-icon></button></div></div>`;
+            });
+        }
+    };
+
+    function saveVideo(title, desc, cat, status, url, type) {
+        const videos = DB.getVideos();
+        videos.unshift({ id: Date.now(), title, desc, category: cat, url, type, active: status === 'active' });
+        DB.saveVideos(videos);
+        Admin.renderVideos();
+        UI.showToast("ویدیو اضافه شد", 'success');
+        document.getElementById('v-title').value = '';
+        document.getElementById('v-url').value = '';
+        document.getElementById('v-file').value = '';
+        pendingVideoFile = null;
+    }
+
+    document.getElementById('v-file').addEventListener('change', function(e) {
+        if(e.target.files[0]) pendingVideoFile = e.target.files[0];
+    });
+
+    // ==========================================
+    // 🖥️ UI & PLAYER
+    // ==========================================
+    const UI = {
+        showLogin: () => { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById('view-login').classList.remove('hidden'); },
+        showDashboard: () => { 
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
+            document.getElementById('view-dashboard').classList.remove('hidden'); 
+            UI.renderUserVideos(); 
+        },
+        renderUserVideos: () => {
+            const grid = document.getElementById('user-video-list');
+            grid.innerHTML = '';
+            const videos = DB.getVideos().filter(v => v.active);
+            
+            // 💎 NEW: REFINED EMPTY STATE 💎
+            if(videos.length === 0) { 
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <ion-icon name="videocam-off-outline" class="empty-icon"></ion-icon>
+                        <div class="empty-text-title">محتوایی برای نمایش وجود ندارد</div>
+                        <div class="empty-text-desc">ویدیوهای جدید به‌زودی در دسترس قرار خواهند گرفت</div>
+                    </div>
+                `; 
+                return; 
+            }
+            
+            videos.forEach((v, index) => {
+                const el = document.createElement('div');
+                el.className = 'video-card-user';
+                el.style.animationDelay = `${index * 100}ms`;
+                el.onclick = () => UI.openPlayer(v);
+                el.innerHTML = `
+                    <div class="user-poster-wrapper">
+                        <div class="user-poster"><ion-icon name="videocam" style="font-size:3rem;"></ion-icon></div>
+                        <div class="glass-play-btn"><ion-icon name="play"></ion-icon></div>
+                        <div class="duration-badge">HD</div>
+                    </div>
+                    <div class="user-card-info">
+                        <div>
+                            <div class="user-card-title">${v.title}</div>
+                            <div class="cat-tag"><ion-icon name="grid-outline"></ion-icon> ${v.category}</div>
+                        </div>
+                        <div class="user-card-meta"><span class="vip-tag">VIP</span></div>
+                    </div>
+                `;
+                grid.appendChild(el);
+            });
+        },
+        openPlayer: (video) => {
+            document.getElementById('view-player').classList.remove('hidden');
+            const videoEl = document.getElementById('player');
+            if (plyrInstance) plyrInstance.destroy();
+            plyrInstance = new Plyr(videoEl, { controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen', 'settings'], settings: ['speed'], autoplay: true });
+            plyrInstance.source = { type: 'video', title: video.title, sources: [{ src: video.url, type: 'video/mp4' }] };
+            Player.setupSecurity();
+        },
+        closePlayer: () => { document.getElementById('view-player').classList.add('hidden'); if(plyrInstance) plyrInstance.stop(); },
+        showAdminLogin: () => { document.getElementById('login-modal').style.display = 'flex'; document.getElementById('admin-pass').value = ''; document.getElementById('admin-pass').focus(); },
+        logoutAdmin: () => UI.showLogin(),
+        showLoginError: (msg) => { const el = document.getElementById('login-error'); document.getElementById('error-text').innerText = msg; el.style.display = 'flex'; el.style.animation = 'none'; el.offsetHeight; el.style.animation = 'shake 0.4s ease-in-out'; },
+        showToast: (msg, type='info') => {
+            const box = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.borderRight = `4px solid ${type === 'success' ? '#4ade80' : type === 'error' ? '#ff6b6b' : '#3b82f6'}`;
+            toast.innerHTML = `<ion-icon name="${type === 'success' ? 'checkmark-circle' : 'alert-circle'}"></ion-icon> ${msg}`;
+            box.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+    };
+
+    const Player = {
+        setupSecurity: () => {
+            const watermark = document.getElementById('watermark');
+            const overlay = document.getElementById('secure-overlay');
+            clearInterval(watermarkInterval);
+            watermark.innerText = `${Auth.currentUser.name} (${Auth.currentUser.code})`;
+            watermarkInterval = setInterval(() => { watermark.style.top = Math.random()*80 + 10 + '%'; watermark.style.left = Math.random()*80 + 10 + '%'; }, 3000);
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden && plyrInstance && !document.getElementById('view-player').classList.contains('hidden')) {
+                    plyrInstance.pause(); overlay.style.display = 'flex'; document.title = "⛔ توقف امنیتی";
+                } else { overlay.style.display = 'none'; document.title = "VIP STREAM"; }
+            });
+        }
+    };
+
+    function hideLoginModal() { document.getElementById('login-modal').style.display = 'none'; }
+    function checkLogin() {
+        if (document.getElementById('admin-pass').value === ADMIN_PASS) {
+            hideLoginModal();
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-admin').classList.remove('hidden');
+            Admin.renderUsers();
+            UI.showToast("مدیریت فعال شد", 'success');
+        } else { UI.showToast("رمز اشتباه است", 'error'); }
+    }
+
+    DB.init();
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+    document.head.appendChild(styleSheet);
+
+</script>
+</body>
+</html>
