@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ایتا مکس | رشد تضمینی کانال ایتا</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;300;400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- تنظیمات اصلی --- */
+        :root {
+            --bg-color: #0b1220;
+            --bg-gradient: radial-gradient(circle at 50% 0%, #13201c 0%, #0b1220 60%);
+            --primary-color: #19d3ae; 
+            --primary-hover: #14b896;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(16px); /* بلور بیشتر برای شیشه‌ای تر شدن */
+            --radius-xl: 30px;
+            --container-width: 1100px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            background-image: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            line-height: 1.7;
+            overflow-x: hidden;
+            padding-bottom: 80px; /* فضای خالی پایین برای دکمه ادمین */
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+
+        .container { max-width: var(--container-width); margin: 0 auto; padding: 0 20px; }
+        .section-padding { padding: 100px 0; }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-header h2 { font-size: 2.2rem; margin-bottom: 15px; font-weight: 800; }
+        .section-header p { color: var(--text-muted); font-size: 1rem; }
+
+        /* --- HEADER (اصلاح شده برای موبایل) --- */
+        header {
+            position: sticky; top: 0; z-index: 1000;
+            background: rgba(11, 18, 32, 0.95); backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,0.08); padding: 15px 0;
+            transition: all 0.3s ease;
+        }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; }
+        
+        .logo { 
+            font-size: 1.8rem; font-weight: 900; color: #fff; letter-spacing: -1px;
+            text-shadow: 0 0 20px rgba(25, 211, 174, 0.6);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .logo span { color: var(--primary-color); }
+        
+        .nav-links { display: flex; gap: 30px; }
+        .nav-links a { color: var(--text-muted); font-weight: 500; font-size: 0.95rem; position: relative; }
+        .nav-links a:hover, .nav-links a.active { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+
+        .btn-header {
+            background: linear-gradient(135deg, #19d3ae, #0d9488);
+            color: #000; padding: 12px 30px; border-radius: 50px;
+            font-weight: 800; font-size: 1rem; border: none; cursor: pointer;
+            box-shadow: 0 0 20px rgba(25, 211, 174, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; overflow: hidden;
+            white-space: nowrap; /* جلوگیری از شکستن متن */
+        }
+        .btn-header::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            transition: 0.5s; transform: skewX(-20deg);
+        }
+        .btn-header:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 0 30px rgba(25, 211, 174, 0.6); }
+        .btn-header:hover::before { left: 150%; }
+
+        @media (max-width: 768px) { .nav-links { display: none; } }
+        /* اصلاح سایز دکمه در موبایل کوچک */
+        @media (max-width: 480px) {
+            .btn-header { padding: 10px 20px; font-size: 0.9rem; }
+            .logo { font-size: 1.5rem; }
+        }
+
+        /* --- HERO --- */
+        .hero { text-align: center; padding: 120px 0 80px; position: relative; }
+        .badge { display: inline-block; background: rgba(25, 211, 174, 0.08); color: var(--primary-color); padding: 6px 16px; border-radius: 50px; font-size: 0.85rem; font-weight: 700; margin-bottom: 25px; border: 1px solid rgba(25, 211, 174, 0.15); }
+        .hero h1 { font-size: 3.5rem; font-weight: 900; margin-bottom: 20px; line-height: 1.3; }
+        .hero h1 span { color: var(--primary-color); text-shadow: 0 0 30px rgba(25, 211, 174, 0.25); }
+        .hero p.subtitle { font-size: 1.2rem; color: var(--text-muted); max-width: 650px; margin: 0 auto 30px; line-height: 1.8; }
+        .hero-buttons { display: flex; gap: 15px; justify-content: center; margin-bottom: 60px; }
+        
+        .btn-outline { background: transparent; border: 1px solid var(--glass-border); color: var(--text-main); padding: 14px 32px; border-radius: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-outline:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        
+        .btn-hero-primary {
+            background: linear-gradient(90deg, var(--primary-color), #115e59);
+            color: #000; border: none; padding: 14px 32px; border-radius: 16px; 
+            font-weight: 800; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 5px 20px rgba(25, 211, 174, 0.2);
+        }
+        .btn-hero-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(25, 211, 174, 0.4); }
+
+        .trust-box { display: flex; justify-content: center; gap: 25px; font-size: 0.9rem; color: var(--text-muted); opacity: 0.8; }
+        .trust-item { display: flex; align-items: center; gap: 8px; }
+        .trust-item svg { width: 18px; height: 18px; color: var(--primary-color); }
+
+        @media (max-width: 768px) { .hero h1 { font-size: 2.2rem; } .hero-buttons { flex-direction: column; padding: 0 40px; } }
+
+        /* --- GRID & GLASS --- */
+        .glass-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: var(--radius-xl); padding: 30px; transition: 0.3s; }
+        .glass-card:hover { transform: translateY(-5px); border-color: rgba(25, 211, 174, 0.2); background: rgba(255, 255, 255, 0.04); }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+
+        /* --- FEATURES --- */
+        .feature-card { text-align: right; padding: 35px; position: relative; overflow: hidden; }
+        .feature-card::before { content:''; position: absolute; top:0; left:0; width: 4px; height: 100%; background: var(--primary-color); opacity: 0.5; }
+        .icon-box { width: 60px; height: 60px; background: rgba(25, 211, 174, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; color: var(--primary-color); }
+        .icon-box svg { width: 30px; height: 30px; }
+        .feature-card h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 15px; color: white; }
+        .feature-card p { font-size: 0.95rem; color: #ccc; line-height: 1.8; }
+
+        /* --- PORTFOLIO --- */
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .project-card { padding: 15px; display: flex; flex-direction: column; }
+        .project-img { height: 180px; border-radius: 16px; background: #1a1a1a; margin-bottom: 15px; position: relative; overflow: hidden; }
+        .project-img img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; transition: 0.5s; }
+        .project-card:hover .project-img img { transform: scale(1.05); opacity: 1; }
+        .badge-time { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; color: white; backdrop-filter: blur(4px); }
+        .project-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 5px; text-align: right; }
+        .project-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; text-align: right; }
+        .stats-row { display: flex; justify-content: space-between; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 10px; margin-bottom: 15px; }
+        .stat-item { text-align: center; }
+        .stat-val { font-weight: 700; color: var(--text-main); display: block; font-size: 0.95rem; }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); }
+        .stat-grow { color: var(--primary-color); }
+
+        /* --- PRICING --- */
+        .pricing-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px 30px;
+            text-align: center; position: relative; transition: all 0.4s ease; display: flex; flex-direction: column;
+        }
+        .pricing-card:hover { transform: translateY(-10px); border-color: rgba(25, 211, 174, 0.3); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+
+        .price-card.gold {
+            background: linear-gradient(145deg, rgba(255, 215, 0, 0.08) 0%, rgba(0,0,0,0) 100%);
+            border: 1px solid rgba(255, 215, 0, 0.4); transform: scale(1.05); z-index: 2;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+            /* استایل مشابه بقیه کارت‌ها */
+            border-radius: 24px; padding: 40px 30px; text-align: center; position: relative; display: flex; flex-direction: column;
+        }
+        .price-card.gold:hover { transform: scale(1.07) translateY(-10px); box-shadow: 0 20px 50px rgba(255, 215, 0, 0.15); }
+
+        .vip-badge { position: absolute; top: 15px; left: 15px; background: #ffd700; color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 900; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); animation: pulse 2s infinite; }
+
+        .pkg-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 15px; color: #fff; }
+        .pkg-price { font-size: 2.2rem; font-weight: 900; color: #fff; margin-bottom: 5px; letter-spacing: -1px; }
+        .pkg-price small { font-size: 1rem; color: var(--text-gray); font-weight: 400; margin-right: 5px; }
+        .pkg-sub { font-size: 0.9rem; color: var(--primary-color); font-weight: 500; margin-bottom: 30px; display: block; }
+
+        .feature-list { list-style: none; text-align: right; margin-bottom: 30px; flex-grow: 1; padding: 0 10px; }
+        .feature-list li { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: #d1d5db; }
+        
+        .icon-check { width: 20px; height: 20px; color: white; background: var(--primary); border-radius: 50%; padding: 3px; flex-shrink: 0; }
+        .icon-cross { width: 20px; height: 20px; color: #ef4444; opacity: 0.5; flex-shrink: 0; }
+        .li-dim { opacity: 0.5; text-decoration: line-through; }
+
+        .btn-price { width: 100%; padding: 15px; border-radius: 15px; border: 1px solid var(--glass-border); background: transparent; color: white; cursor: pointer; font-weight: 700; transition: 0.3s; font-family: 'Vazirmatn', sans-serif; }
+        .btn-price:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        
+        .btn-gold { background: linear-gradient(135deg, #ffd700, #b8860b); color: black; border: none; box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3); font-family: 'Vazirmatn', sans-serif; width: 100%; padding: 15px; border-radius: 15px; font-weight: 700; cursor: pointer; }
+        .btn-gold:hover { transform: scale(1.02); color: black; }
+
+        /* --- TESTIMONIALS --- */
+        .testimonial-wrapper { overflow: hidden; position: relative; height: 380px; display: flex; align-items: center; perspective: 1000px; }
+        .testimonial-track { display: flex; gap: 30px; position: absolute; left: 0; width: max-content; padding: 20px 0; will-change: transform; }
+        .t-card { width: 320px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(25, 211, 174, 0.1); border-radius: 20px; padding: 25px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+        .t-head { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .t-avatar { width: 45px; height: 45px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000; font-size: 1.2rem; }
+        .t-info h4 { font-size: 1rem; margin: 0; color: white; }
+        .t-info span { font-size: 0.8rem; color: var(--text-muted); }
+        .t-text { font-size: 0.9rem; color: #e5e7eb; line-height: 1.8; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; font-style: italic; }
+        .t-foot { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
+        .t-stars { color: #fbbf24; letter-spacing: 2px; font-size: 0.9rem; }
+        .t-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: var(--primary-color); border: 1px solid var(--primary-color); width: 40px; height: 40px; border-radius: 50%; z-index: 10; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.3s; backdrop-filter: blur(5px); }
+        .t-btn:hover { background: var(--primary-color); color: black; box-shadow: 0 0 15px var(--primary-color); }
+        .t-prev { right: 10px; } .t-next { left: 10px; }
+
+        /* --- CTA BOX (اصلاح شده: شیشه‌ای و هیجانی) --- */
+        #contact { position: relative; z-index: 1; overflow: hidden; }
+        .cta-box { 
+            position: relative;
+            background: var(--glass-bg); /* استفاده از متغیر شیشه ای */
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px; 
+            padding: 60px 40px; 
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); /* سایه عمیق تر */
+            overflow: hidden; /* برای محدود کردن افکت نورانی */
+        }
+        /* افکت نورانی چرخشی پشت کادر CTA */
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150%; /* بزرگتر از کادر */
+            height: 150%;
+            background: conic-gradient(
+                from 0deg at 50% 50%,
+                transparent 0deg,
+                var(--primary-color) 60deg,
+                transparent 120deg,
+                transparent 360deg
+            );
+            animation: rotate-glow 8s linear infinite;
+            opacity: 0.15; /* نور ملایم */
+            z-index: -1; /* پشت محتوا */
+            filter: blur(50px); /* محو کردن لبه های نور */
+        }
+
+        .cta-btns-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; margin: 40px auto 0; }
+        .cta-btn-item { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 18px; border-radius: 16px; font-weight: 700; color: white; transition: 0.3s; }
+        .cta-btn-item:hover { transform: translateY(-5px); }
+        .btn-eitaa { background: linear-gradient(135deg, #fb923c, #c2410c); }
+        .btn-tg { background: linear-gradient(135deg, #38bdf8, #0284c7); }
+        .btn-call { border: 2px solid var(--primary-color); color: var(--primary-color); } /* رنگ سبز */
+        .btn-call:hover { background: var(--primary-color); color: #000; }
+
+        footer { border-top: 1px solid var(--glass-border); padding: 40px 0; text-align: center; color: var(--text-gray); margin-top: 100px; /* فاصله بیشتر از بالا */ }
+
+        @media (max-width: 900px) { .grid-3, .cta-btns-grid { grid-template-columns: 1fr; } .price-card.gold { transform: scale(1); margin: 20px 0; } }
+        @media (max-width: 600px) { .hero h1 { font-size: 2.2rem; } .hero-buttons { flex-direction: column; padding: 0 40px; } .t-card { width: 280px; } }
+
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; } }
+        @keyframes rotate-glow { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        /* Admin */
+        #admin-trigger { position: fixed; bottom: 20px; left: 20px; width: 45px; height: 45px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 9999; opacity: 0.2; transition: 0.3s; font-size: 20px; }
+        #admin-trigger:hover { opacity: 1; background: var(--primary-color); color: black; }
+        #admin-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 10000; align-items: center; justify-content: center; }
+        .admin-box { background: #111; border: 1px solid var(--primary-color); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: right; }
+        .admin-input { width: 100%; background: #222; border: 1px solid #333; padding: 12px; margin-bottom: 12px; color: white; border-radius: 8px; font-family: inherit; }
+        .code-box { width: 100%; height: 100px; background: #000; color: #0f0; font-family: monospace; padding: 10px; margin-top: 10px; direction: ltr; border-radius: 5px; border: 1px dashed #555; font-size: 0.8rem; }
+        .hidden-section { display: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container nav-container">
+            <div class="logo">ایتا <span>مکس</span></div>
+            <ul class="nav-links">
+                <li><a href="#hero" class="active">خانه</a></li>
+                <li><a href="#portfolio">نمونه‌کارها</a></li>
+                <li><a href="#testimonials">نظرات</a></li>
+                <li><a href="#pricing">تعرفه‌ها</a></li>
+                <li><a href="#contact">تماس</a></li>
+            </ul>
+            <a href="#contact" class="btn-header">ثبت سفارش</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="hero">
+            <div class="container">
+                <span class="badge">تضمین کیفیت ۱۰۰٪</span>
+                <h1>پایان دور ریختن پول در<br><span>تبلیغات بی‌بازده ایتا!</span></h1>
+                <p class="subtitle">دیگر نگران ممبر فیک و ریزش نباشید. ما استراتژی رشدی داریم که رقبای شما از آن بی‌خبرند. افزایش عضو واقعی و فعال در ایتا با روش‌های هدفمند.</p>
+                
+                <div class="hero-buttons">
+                    <a href="#portfolio" class="btn-outline">مشاهده نتایج واقعی</a>
+                    <a href="#contact" class="btn-header">سفارش سریع</a>
+                </div>
+
+                <div class="trust-box">
+                    <div class="trust-item"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>تضمین کیفیت</div>
+                    <div class="trust-item"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>پشتیبانی ۲۴ ساعته</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="section-padding">
+            <div class="container">
+                <div class="section-header">
+                    <h2>چرا ایتا مکس؟</h2>
+                    <p>تفاوت ما در کیفیت و تعهد است</p>
+                </div>
+                <div class="grid-3">
+                    <div class="feature-card">
+                        <div class="icon-box"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                        <h3>تضمین کیفیت و ریزش</h3>
+                        <p>ما از کیفیت کار خود مطمئنیم. تمامی ممبرهای جذب شده واقعی و فعال هستند. در صورت ریزش غیرعادی، ما متعهد به جبران هستیم.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon-box"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg></div>
+                        <h3>ضمانت بازگشت وجه</h3>
+                        <p>اعتماد شما سرمایه ماست. اگر سفارش شما طبق تعهدات و در زمان مقرر انجام نشود، کل مبلغ پرداختی بدون قید و شرط عودت داده می‌شود.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon-box"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg></div>
+                        <h3>تبلیغات هدفمند</h3>
+                        <p>تبلیغات کورکورانه فایده ندارد. ما بنر شما را دقیقاً در کانال‌هایی منتشر می‌کنیم که مخاطب هدف شما آنجاست تا بازدهی حداکثری داشته باشید.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio" class="section-padding">
+            <div class="container">
+                <div class="section-header">
+                    <h2>پروژه‌های اخیر ما</h2>
+                    <p>نمونه‌هایی از رشد کانال‌های مشتریان عزیز</p>
+                </div>
+                <div class="portfolio-grid">
+                    <div class="glass-card project-card">
+                        <div class="project-img"><img src="https://8pic.ir/wp-content/uploads/upf-docs/IMG_20251220_151801_838.jpg" alt="Portfolio"><div class="badge-time">۳ روز</div></div>
+                        <h3 class="project-title">کانال روان‌درمانگر</h3>
+                        <div class="stats-row"><div class="stat-item"><span class="stat-label">شروع</span><span class="stat-val">201</span></div><div class="stat-item"><span class="stat-label">پایان</span><span class="stat-val">1388</span></div></div>
+                    </div>
+                    <div class="glass-card project-card">
+                        <div class="project-img"><img src="https://8pic.ir/wp-content/uploads/upf-docs/IMG_20251220_151759_928.jpg" alt="Portfolio"><div class="badge-time">۴ روز</div></div>
+                        <h3 class="project-title">تناسب اندام</h3>
+                        <div class="stats-row"><div class="stat-item"><span class="stat-label">شروع</span><span class="stat-val">96</span></div><div class="stat-item"><span class="stat-label">پایان</span><span class="stat-val">1590</span></div></div>
+                    </div>
+                    <div class="glass-card project-card">
+                        <div class="project-img"><img src="https://8pic.ir/wp-content/uploads/upf-docs/IMG_20251220_151757_868.jpg" alt="Portfolio"><div class="badge-time">۲ روز</div></div>
+                        <h3 class="project-title">راز جوانی پوست</h3>
+                        <div class="stats-row"><div class="stat-item"><span class="stat-label">شروع</span><span class="stat-val">527</span></div><div class="stat-item"><span class="stat-label">پایان</span><span class="stat-val">1706</span></div></div>
+                    </div>
+                    <div class="glass-card project-card">
+                        <div class="project-img"><img src="https://8pic.ir/wp-content/uploads/upf-docs/IMG_20251220_151754_943.jpg" alt="Portfolio"><div class="badge-time">۵ روز</div></div>
+                        <h3 class="project-title">محصولات بانوی خاص</h3>
+                        <div class="stats-row"><div class="stat-item"><span class="stat-label">شروع</span><span class="stat-val">282</span></div><div class="stat-item"><span class="stat-label">پایان</span><span class="stat-val">1346</span></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="section-padding">
+            <div class="container">
+                <div class="section-header">
+                    <h2>پکیج‌های افزایش ممبر</h2>
+                    <p>قیمت مناسب، کیفیت تضمینی</p>
+                </div>
+                
+                <div class="grid-3" style="align-items: center;">
+                    
+                    <div class="pricing-card">
+                        <h3 class="pkg-title">طرح نقره‌ای</h3>
+                        <div class="pkg-price">950,000 <small>تومان</small></div>
+                        <span class="pkg-sub">برای ۱۰۰۰ عضو واقعی</span>
+                        
+                        <ul class="feature-list">
+                            <li><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> ۱۰۰۰ ممبر کاملاً واقعی</li>
+                            <li><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> تضمین بازگشت وجه</li>
+                            <li><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> فروش ۲ برابر</li>
+                            <li class="li-dim"><svg class="icon-cross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> هدیه ویژه</li>
+                            <li class="li-dim"><svg class="icon-cross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> پشتیبانی تیم مدیریت</li>
+                            <li class="li-dim"><svg class="icon-cross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> سرعت نور</li>
+                        </ul>
+                        <button class="btn-price">ثبت سفارش</button>
+                    </div>
+
+                    <div class="pricing-card">
+                        <h3 class="pkg-title">طرح اقتصادی</h3>
+                        <div class="pkg-price">1,600,000 <small>تومان</small></div>
+                        <span class="pkg-sub">برای ۲,۰۰۰ عضو واقعی</span>
+                        
+                        <ul class="feature-list">
+                            <li><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> ۲,۰۰۰ ممبر واقعی</li>
+                            <li><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> تضمین کیفیت و ریزش کم</li>
+                            <li><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> شروع فوری سفارش</li>
+                            <li><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> افزایش تعامل کانال</li>
+                            <li class="li-dim"><svg class="icon-cross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> هدیه ویژه (بازدید)</li>
+                            <li class="li-dim"><svg class="icon-cross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> پشتیبانی اختصاصی</li>
+                        </ul>
+                        <button class="btn-price">ثبت سفارش</button>
+                    </div>
+
+                    <div class="price-card gold">
+                        <div class="vip-badge">پیشنهاد ویژه VIP</div>
+                        <h3 class="pkg-title" style="color:#ffd700">طرح طلایی</h3>
+                        <div class="pkg-price" style="color:#ffd700">3,500,000 <small>تومان</small></div>
+                        <span class="pkg-sub" style="color:white">۴۰۰۰ عضو + ۵۰۰ هدیه</span>
+                        
+                        <ul class="feature-list">
+                            <li><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> ۴۰۰۰ ممبر کاملاً فعال</li>
+                            <li><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> <strong>+۵۰۰ ممبر هدیه رایگان</strong></li>
+                            <li><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> پشتیبانی اختصاصی تیم</li>
+                            <li><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> سرعت انجام بسیار بالا</li>
+                            <li><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> تضمین کیفیت ۱۰۰٪</li>
+                            <li><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> مشاوره رایگان رشد</li>
+                        </ul>
+                        <button class="btn-gold">سفارش طلایی</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-padding">
+            <div class="container">
+                <div class="section-header">
+                    <h2>تجربه مشتریان ما</h2>
+                    <p>نظرات واقعی مدیرانی که به ما اعتماد کردند</p>
+                </div>
+                <div class="testimonial-wrapper">
+                    <button class="t-btn t-prev" onclick="moveSlider(-1)">❮</button>
+                    <button class="t-btn t-next" onclick="moveSlider(1)">❯</button>
+                    <div class="testimonial-track" id="track">
+                        </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="section-padding">
+            <div class="container">
+                <div class="cta-box">
+                    <h2 style="font-size:2.5rem; margin-bottom:20px;">شروع رشد کانال شما</h2>
+                    <p style="color:var(--text-gray); margin-bottom:40px;">برای دریافت مشاوره رایگان و ثبت سفارش، همین حالا پیام دهید.</p>
+                    <div class="cta-btns-grid">
+                        <a href="https://eitaa.com/Hooshino_SP" class="cta-btn-item btn-eitaa">پیام در ایتا</a>
+                        <a href="https://t.me/mevolkas" class="cta-btn-item btn-tg">پیام در تلگرام</a>
+                        <a href="tel:+989937133974" class="cta-btn-item btn-call">تماس مستقیم</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="logo" style="margin-bottom:10px; justify-content:center;">ایتا مکس</div>
+            <p>© 1403 تمامی حقوق برای تیم تبلیغاتی ایتا مکس محفوظ است.</p>
+        </div>
+    </footer>
+
+    <div id="admin-trigger">⚙️</div>
+    <div id="admin-modal">
+        <div class="admin-box">
+            <div id="login-state">
+                <h3 style="color:white; margin-bottom:15px">ورود ادمین</h3>
+                <input type="password" id="admin-pass" class="admin-input" placeholder="رمز عبور...">
+                <button onclick="checkAdmin()" class="btn-header" style="width:100%">ورود</button>
+            </div>
+            <div id="dashboard-state" class="hidden-section">
+                <h3 style="color:white; margin-bottom:15px">مدیریت نمونه‌کارها</h3>
+                <input type="text" id="p-title" class="admin-input" placeholder="عنوان کانال">
+                <input type="text" id="p-desc" class="admin-input" placeholder="توضیح">
+                <input type="text" id="p-time" class="admin-input" placeholder="مدت">
+                <input type="text" id="p-img" class="admin-input" placeholder="لینک عکس">
+                <div style="display:flex; gap:10px;"><input type="number" id="p-start" class="admin-input" placeholder="شروع"><input type="number" id="p-end" class="admin-input" placeholder="پایان"></div>
+                <button onclick="addProject()" class="btn-header" style="width:100%">افزودن</button>
+                <button onclick="closeAdmin()" class="btn-outline" style="width:100%; margin-top:5px;">بستن</button>
+                <textarea id="output-code" class="code-box"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Testimonials Slider
+        const track = document.getElementById('track');
+        const comments = [
+            {n:"مریم حسینی", t:"لوازم آرایشی", m:"اولش واقعا فکر می‌کردم فیکه و پولم هدر میره، ولی بعد از تست دیدم که ویو کانالم چقدر رفت بالا. الان فروشم تقریبا دو برابر شده."},
+            {n:"علی محمدی", t:"آموزش بورس", m:"قبلا خیلی جاها تبلیغ کرده بودم و فقط ممبر فیک نصیبم شده بود. اما کار شما واقعا متفاوت بود. تعامل کانالم عالی شده."},
+            {n:"رضا کاظمی", t:"لوازم یدکی", m:"من خیلی سخت اعتماد می‌کنم ولی وقتی گزارش قبل و بعد رو دیدم تعجب کردم. سرعت انجام کار عالی بود."},
+            {n:"سارا نوری", t:"مشاور کنکور", m:"پلن طلایی واقعا میصرفه. اولش شک داشتم هزینه کنم ولی الان میبینم که بهترین سرمایه‌گذاری برای کانالم بود."},
+            {n:"حسین رحیمی", t:"کانال خبری", m:"پشتیبانی خیلی خوب و با حوصله‌ای دارید. قشنگ راهنمایی کردید که چه ساعتی تبلیغ برم بهتره."}
+        ];
+
+        comments.forEach(c => {
+            const card = document.createElement('div');
+            card.className = 't-card';
+            card.innerHTML = `<div class="t-head"><div class="t-avatar">${c.n[0]}</div><div class="t-info"><h4>${c.n}</h4><span>${c.t}</span></div></div><p class="t-text">"${c.m}"</p><div class="t-foot"><span class="t-stars">★★★★★</span><span class="t-date">تایید شده</span></div>`;
+            track.appendChild(card);
+        });
+        // Clone for infinite loop visually
+        comments.forEach(c => {
+            const clone = track.children[0].cloneNode(true);
+            track.appendChild(clone);
+        });
+
+        let pos = 0;
+        function slide() {
+            pos -= 0.5;
+            if(pos <= -(comments.length * 350)) pos = 0; 
+            track.style.transform = `translateX(${pos}px)`;
+            requestAnimationFrame(slide);
+        }
+        slide();
+        
+        function moveSlider(dir) { pos += (dir * 350 * -1); }
+
+        // Admin
+        const modal = document.getElementById('admin-modal');
+        document.getElementById('admin-trigger').onclick = () => modal.style.display = 'flex';
+        function checkAdmin(){ if(document.getElementById('admin-pass').value==='1234'){document.getElementById('login-state').style.display='none';document.getElementById('dashboard-state').style.display='block';}else alert('رمز اشتباه'); }
+        function closeAdmin(){ modal.style.display='none'; }
+        function addProject(){
+            const t=document.getElementById('p-title').value, d=document.getElementById('p-desc').value, tm=document.getElementById('p-time').value, i=document.getElementById('p-img').value, s=document.getElementById('p-start').value, e=document.getElementById('p-end').value;
+            if(!t || !i) return alert('فیلدها خالی');
+            const h = `<div class="glass-card project-card"><div class="project-img"><span class="badge-time">${tm}</span><img src="${i}" alt="${t}"></div><h3 class="project-title">${t}</h3><p class="project-desc">${d}</p><div class="stats-row"><div class="stat-item"><span class="stat-label">شروع</span><span class="stat-val">${s}</span></div><div class="stat-item"><span class="stat-label">پایان</span><span class="stat-val">${e}</span></div><div class="stat-item"><span class="stat-label">رشد</span><span class="stat-val stat-grow">+${e-s}</span></div></div></div>`;
+            document.getElementById('portfolio-container').insertAdjacentHTML('afterbegin', h);
+            document.getElementById('output-code').value = h;
+            alert('کد ساخته شد');
+        }
+        window.onclick = e => { if(e.target == modal) modal.style.display='none'; }
+    </script>
+</body>
+</html>
