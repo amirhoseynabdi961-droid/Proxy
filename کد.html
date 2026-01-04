@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game of Thrones - Streaming Platform</title>
+<style>
+:root {
+--primary: #d4af37; /* Gold */
+--bg-dark: #0f0f0f;
+--bg-panel: #1a1a1a;
+--text-main: #e0e0e0;
+--text-muted: #a0a0a0;
+--active-item: #2a2a2a;
+}
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Header */
+    header {
+        height: 60px;
+        background-color: var(--bg-panel);
+        border-bottom: 1px solid #333;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    /* Main Layout */
+    .container {
+        display: flex;
+        flex: 1;
+        height: calc(100vh - 60px);
+    }
+
+    /* Video Player Area */
+    .player-area {
+        flex: 3;
+        background: #000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+    }
+
+    .video-wrapper {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #000;
+        position: relative;
+    }
+
+    video {
+        width: 100%;
+        height: 100%;
+        max-height: 80vh;
+        outline: none;
+    }
+
+    /* Custom Controls Bar */
+    .control-bar {
+        background: var(--bg-panel);
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #333;
+    }
+
+    .video-info h2 {
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+    }
+    .video-info p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .quality-controls button {
+        background: transparent;
+        border: 1px solid var(--text-muted);
+        color: var(--text-main);
+        padding: 5px 10px;
+        margin-left: 5px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+
+    .quality-controls button:hover, .quality-controls button.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #000;
+    }
+
+    /* Sidebar - Episodes */
+    .sidebar {
+        flex: 1;
+        min-width: 300px;
+        background-color: var(--bg-panel);
+        border-right: 1px solid #333;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-header {
+        padding: 15px;
+        background: #222;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid #333;
+        font-weight: bold;
+    }
+
+    /* Accordion Style */
+    .season-group {
+        border-bottom: 1px solid #333;
+    }
+
+    .season-header {
+        padding: 15px;
+        background: var(--bg-panel);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background 0.2s;
+    }
+
+    .season-header:hover {
+        background: #252525;
+    }
+
+    .season-header span {
+        font-weight: 600;
+    }
+
+    .episode-list {
+        display: none;
+        background: #111;
+    }
+
+    .episode-list.open {
+        display: block;
+    }
+
+    .episode-item {
+        padding: 12px 20px;
+        cursor: pointer;
+        border-bottom: 1px solid #222;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s;
+    }
+
+    .episode-item:hover {
+        background: #1f1f1f;
+    }
+
+    .episode-item.active {
+        background: var(--active-item);
+        border-right: 3px solid var(--primary);
+    }
+
+    .episode-number {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-left: 10px;
+        min-width: 30px;
+    }
+
+    .episode-title {
+        font-size: 0.95rem;
+    }
+
+    /* Fullscreen Toggle */
+    .fs-btn {
+        background: none;
+        border: none;
+        color: var(--text-main);
+        font-size: 1.2rem;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+        }
+        .player-area {
+            flex: none;
+            height: 40vh;
+        }
+        .sidebar {
+            flex: 1;
+        }
+    }
+</style>
+
+</head>
+<body>
+<header>
+    <div class="logo">GOT STREAM</div>
+</header>
+
+<div class="container">
+    <aside class="sidebar" id="playlistContainer">
+        </aside>
+
+    <section class="player-area">
+        <div class="video-wrapper">
+            <video id="mainPlayer" controls crossorigin="anonymous" poster="[https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg](https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg)">
+                <source id="videoSource" src="" type="video/mp4">
+                <track id="subFa" label="Farsi" kind="subtitles" srclang="fa" default>
+                <track id="subEn" label="English" kind="subtitles" srclang="en">
+                مرورگر شما از تگ ویدیو پشتیبانی نمی‌کند.
+            </video>
+        </div>
+        
+        <div class="control-bar">
+            <div class="video-info">
+                <h2 id="currentTitle">Select an Episode</h2>
+                <p id="currentMeta">-</p>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <button class="fs-btn" onclick="toggleFullScreen()">⛶</button>
+                <div class="quality-controls" id="qualityBtns">
+                    <button onclick="changeQuality('480')" id="btn480">480p</button>
+                    <button onclick="changeQuality('720')" id="btn720" class="active">720p</button>
+                    <button onclick="changeQuality('1080')" id="btn1080">1080p</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    // --- 1. DATA GENERATION & MOCKING ---
+    
+    // Helper to create a functional VTT Subtitle Blob for testing
+    function createSubtitleBlob(lang) {
+        const vttContent = `WEBVTT
+
+00:00:01.000 --> 00:00:05.000
+این یک زیرنویس آزمایشی برای زبان ${lang} است.
+This is a test subtitle for ${lang}.
+00:00:06.000 --> 00:00:10.000
+اگر این متن را می‌بینید، سیستم زیرنویس درست کار می‌کند.
+If you see this, the subtitle system works.
+`;
+const blob = new Blob([vttContent], { type: 'text/vtt' });
+return URL.createObjectURL(blob);
+}
+    const faBlob = createSubtitleBlob('فارسی');
+    const enBlob = createSubtitleBlob('English');
+    const sampleVideo = "[http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4](http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4)";
+
+    // Generate Data for 8 Seasons
+    const database = [];
+    const seasonCounts = {1:10, 2:10, 3:10, 4:10, 5:10, 6:10, 7:7, 8:6};
+
+    for (let s = 1; s <= 8; s++) {
+        let seasonData = {
+            season: s,
+            episodes: []
+        };
+        
+        for (let e = 1; e <= seasonCounts[s]; e++) {
+            // Default placeholders
+            let epObj = {
+                id: `s${s}e${e}`,
+                season: s,
+                episode: e,
+                title: `Season ${s} Episode ${e}`, // Placeholder title
+                video480: `https://example.com/video/s${s}e${e}_480.mp4`,
+                video720: `https://example.com/video/s${s}e${e}_720.mp4`,
+                video1080: `https://example.com/video/s${s}e${e}_1080.mp4`,
+                subtitleFa: faBlob, // Using blob for test
+                subtitleEn: enBlob
+            };
+
+            // REAL TEST DATA for S1 E1
+            if (s === 1 && e === 1) {
+                epObj.title = "Winter Is Coming";
+                epObj.video480 = sampleVideo; // Using same file for test
+                epObj.video720 = sampleVideo;
+                epObj.video1080 = sampleVideo;
+            }
+            
+            seasonData.episodes.push(epObj);
+        }
+        database.push(seasonData);
+    }
+
+    // --- 2. STATE & DOM ELEMENTS ---
+    let currentEpData = null;
+    let currentQuality = '720';
+    
+    const player = document.getElementById('mainPlayer');
+    const source = document.getElementById('videoSource');
+    const trackFa = document.getElementById('subFa');
+    const trackEn = document.getElementById('subEn');
+    const titleEl = document.getElementById('currentTitle');
+    const metaEl = document.getElementById('currentMeta');
+    const playlistContainer = document.getElementById('playlistContainer');
+
+    // --- 3. RENDERING UI ---
+    
+    function renderPlaylist() {
+        playlistContainer.innerHTML = '<div class="sidebar-header">Seasons</div>';
+        
+        database.forEach(season => {
+            // Create Season Header
+            const group = document.createElement('div');
+            group.className = 'season-group';
+            
+            const header = document.createElement('div');
+            header.className = 'season-header';
+            header.innerHTML = `<span>Season ${season.season}</span> <span>▼</span>`;
+            header.onclick = () => toggleSeason(group);
+
+            // Create Episode List Container
+            const list = document.createElement('div');
+            list.className = 'episode-list';
+            // Open Season 1 by default
+            if (season.season === 1) list.classList.add('open');
+
+            season.episodes.forEach(ep => {
+                const item = document.createElement('div');
+                item.className = 'episode-item';
+                item.id = `item-${ep.id}`;
+                item.innerHTML = `
+                    <span class="episode-number">${ep.episode}</span>
+                    <span class="episode-title">${ep.title}</span>
+                `;
+                item.onclick = () => loadEpisode(ep);
+                list.appendChild(item);
+            });
+
+            group.appendChild(header);
+            group.appendChild(list);
+            playlistContainer.appendChild(group);
+        });
+    }
+
+    function toggleSeason(groupElement) {
+        const list = groupElement.querySelector('.episode-list');
+        const isOpen = list.classList.contains('open');
+        
+        // Optional: Close others
+        document.querySelectorAll('.episode-list').forEach(el => el.classList.remove('open'));
+        
+        if (!isOpen) {
+            list.classList.add('open');
+        }
+    }
+
+    // --- 4. PLAYER LOGIC ---
+
+    function loadEpisode(ep) {
+        currentEpData = ep;
+        
+        // Update Active UI
+        document.querySelectorAll('.episode-item').forEach(i => i.classList.remove('active'));
+        document.getElementById(`item-${ep.id}`).classList.add('active');
+
+        // Update Text Info
+        titleEl.textContent = ep.title;
+        metaEl.textContent = `Season ${ep.season} | Episode ${ep.episode}`;
+
+        // Set Video Source based on current quality preference
+        const videoUrl = ep[`video${currentQuality}`];
+        
+        // Save current time if switching quality (logic handled in changeQuality, here we just load new)
+        player.pause();
+        source.src = videoUrl;
+        
+        // Update Subtitles
+        trackFa.src = ep.subtitleFa;
+        trackEn.src = ep.subtitleEn;
+
+        player.load();
+        
+        // Note: Auto-play might be blocked by browsers if not interacted with
+        const playPromise = player.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log("Autoplay prevented by browser policy.");
+            });
+        }
+    }
+
+    function changeQuality(quality) {
+        if (!currentEpData) return;
+        if (currentQuality === quality) return;
+
+        // UI Update
+        document.querySelectorAll('.quality-controls button').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn${quality}`).classList.add('active');
+
+        currentQuality = quality;
+        
+        // Maintain timestamp
+        const currentTime = player.currentTime;
+        const isPaused = player.paused;
+
+        source.src = currentEpData[`video${quality}`];
+        player.load();
+        player.currentTime = currentTime;
+        
+        if (!isPaused) player.play();
+    }
+
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            if (player.requestFullscreen) {
+                player.requestFullscreen();
+            } else if (player.webkitRequestFullscreen) { /* Safari */
+                player.webkitRequestFullscreen();
+            } else if (player.msRequestFullscreen) { /* IE11 */
+                player.msRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+    // --- 5. INITIALIZATION ---
+    window.onload = () => {
+        renderPlaylist();
+        // Load First Episode Automatically (The Working One)
+        loadEpisode(database[0].episodes[0]);
+    };
+
+</script>
+
+</body>
+</html>
