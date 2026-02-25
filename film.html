@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>نئو-سینما | مرجع فیلم و سریال</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    
+    <style>
+        :root {
+            --primary-color: #ff3e3e; /* قرمز نئونی */
+            --secondary-color: #ff8f00; /* نارنجی آتشین */
+            --bg-main: #0f0f0f; /* مشکی عمیق */
+            --bg-card: #1a1a1a; /* خاکستری تیره برای کارت‌ها */
+            --text-light: #f5f5f5;
+            --text-gray: #aaaaaa;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-light);
+            font-family: 'Vazirmatn', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- هدر و عنوان --- */
+        header {
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(15,15,15,0) 100%);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            font-weight: 900;
+            /* افکت متن گرادینت */
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(255, 62, 62, 0.3);
+            letter-spacing: -1px;
+        }
+
+        .tagline { color: var(--text-gray); margin-top: 10px; font-size: 1.2rem; }
+
+        /* --- باکس جستجو --- */
+        .search-container {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            padding: 0 20px;
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-box-inner {
+            display: flex;
+            width: 100%;
+            max-width: 700px;
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(15px); /* افکت شیشه‌ای */
+            border-radius: 50px;
+            padding: 5px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            transition: 0.3s;
+        }
+
+        .search-box-inner:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 20px 40px rgba(255, 62, 62, 0.2);
+        }
+
+        input {
+            flex-grow: 1;
+            padding: 15px 25px;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            font-size: 16px;
+            font-family: 'Vazirmatn', sans-serif;
+            outline: none;
+        }
+
+        button#searchBtn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 40px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.4s;
+            font-size: 16px;
+            font-family: 'Vazirmatn', sans-serif;
+            box-shadow: 0 10px 20px -10px rgba(255, 62, 62, 0.5);
+        }
+
+        button#searchBtn:hover { transform: scale(1.05); box-shadow: 0 15px 30px -10px rgba(255, 62, 62, 0.8); }
+
+        /* --- لودر و پیام‌ها --- */
+        .status-message { text-align: center; color: var(--primary-color); font-size: 1.2rem; margin: 30px; display: none; }
+
+        /* --- شبکه‌بندی فیلم‌ها --- */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 30px;
+            padding: 20px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* --- کارت فیلم (طراحی خفن) --- */
+        .movie-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* انیمیشن فنری */
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .movie-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(255, 62, 62, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .poster-container {
+            position: relative;
+            width: 100%;
+            padding-top: 150%; /* نسبت تصویر استاندارد پوستر (2:3) */
+            overflow: hidden;
+        }
+
+        .poster-container img {
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.4s;
+        }
+
+        .movie-card:hover img { transform: scale(1.1); opacity: 0.7; }
+
+        .badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 2;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .movie-info {
+            padding: 15px;
+            position: relative;
+        }
+
+        .movie-info h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .movie-info p { margin: 0; color: var(--text-gray); font-size: 14px; }
+
+        /* --- مودال پخش (Pop-up) --- */
+        .modal-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(20px); /* بلور شدید پس‌زمینه */
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            width: 100%; max-width: 950px;
+            background: #111;
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from {transform: translateY(50px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+
+        .close-btn {
+            position: absolute;
+            top: 15px; right: 20px;
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 10;
+            background: rgba(255,255,255,0.1);
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.3s;
+        }
+        .close-btn:hover { background: var(--primary-color); transform: rotate(90deg); }
+
+        .iframe-container {
+            position: relative;
+            padding-bottom: 56.25%; /* نسبت 16:9 */
+            height: 0;
+            background: #000;
+        }
+        .iframe-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .server-controls {
+            padding: 20px;
+            background: #1a1a1a;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .server-btn {
+            padding: 10px 20px;
+            background: #333;
+            color: #aaa;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Vazirmatn', sans-serif;
+            transition: 0.3s;
+            border: 1px solid transparent;
+        }
+        .server-btn.active { background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); color: white; box-shadow: 0 5px 15px rgba(255, 62, 62, 0.3); }
+        .server-btn:hover:not(.active) { background: #444; border-color: #666; }
+
+        .footer-note { text-align: center; padding: 30px; color: var(--text-gray); font-size: 0.9rem; margin-top: 50px; border-top: 1px solid #222;}
+    </style>
+</head>
+<body onload="initTrending()">
+
+    <header>
+        <h1>NEO-CINEMA</h1>
+        <p class="tagline">پلتفرم اختصاصی فیلم و سریال امیرحسین</p>
+    </header>
+
+    <div class="search-container">
+        <div class="search-box-inner">
+            <input type="text" id="searchInput" placeholder="نام انگلیسی فیلم یا سریال (مثلاً: Joker, See)..." onkeydown="if(event.key === 'Enter'){performSearch()}">
+            <button id="searchBtn" onclick="performSearch()">بگرد ⚡</button>
+        </div>
+    </div>
+
+    <h3 id="statusMsg" class="status-message">در حال برقراری ارتباط با دیتابیس... 📡</h3>
+
+    <div class="movies-grid" id="resultsGrid">
+        </div>
+
+    <div class="modal-overlay" id="playerModal" onclick="handleModalClick(event)">
+        <div class="modal-content">
+            <div class="close-btn" onclick="closePlayer()">×</div>
+            <div class="iframe-container" id="videoFrameContainer">
+                </div>
+            <div class="server-controls" id="serverButtons">
+                </div>
+            <p style="text-align: center; color: #888; font-size: 13px; padding-bottom: 15px; margin:0;">
+                ⚠️ نکته مهم: برای پخش، حتماً فیلترشکن خود را روشن کنید. اگر سروری کار نکرد، سرور دیگر را امتحان کنید.
+            </p>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        طراحی و توسعه با ❤️ توسط امیرحسین (کلاس هشتم)
+    </div>
+
+    <script>
+        const API_KEY = '3ef6bfcf'; // کلید اختصاصی شما
+        let currentMovieId = null;
+        let currentMovieType = null;
+
+        const statusMsg = document.getElementById('statusMsg');
+        const resultsGrid = document.getElementById('resultsGrid');
+
+        // --- توابع کمکی ---
+        function showLoading(show) {
+            statusMsg.style.display = show ? 'block' : 'none';
+            statusMsg.innerHTML = show ? 'در حال جستجو در آرشیو... ⏳' : '';
+        }
+        function showError(msg) {
+            statusMsg.style.display = 'block';
+            statusMsg.innerHTML = `❌ ${msg}`;
+            resultsGrid.innerHTML = '';
+        }
+
+        // 1. لود کردن محتوای اولیه (ویترین)
+        async function initTrending() {
+            const trendingList = ['Joker', 'Breaking Bad', 'Oppenheimer', 'Stranger Things', 'Interstellar', 'Peaky Blinders', 'Avengers', 'Game of Thrones'];
+            statusMsg.style.display = 'block';
+            statusMsg.innerHTML = 'در حال آماده‌سازی ویترین... 🍿';
+            
+            resultsGrid.innerHTML = '';
+            for(const title of trendingList) {
+                try {
+                    const res = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${API_KEY}`);
+                    const data = await res.json();
+                    if(data.Response === "True") createMovieCard(data);
+                } catch(e) { console.error(e); }
+            }
+            statusMsg.style.display = 'none';
+        }
+
+        // 2. تابع جستجوی اصلی
+        async function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if(!query) { showError("لطفاً اسم فیلم یا سریال را بنویسید!"); return; }
+            
+            showLoading(true);
+            resultsGrid.innerHTML = '';
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 ثانیه تایم‌اوت
+
+                const res = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(query)}&apikey=${API_KEY}`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                const data = await res.json();
+                
+                showLoading(false);
+
+                if(data.Response === "True") {
+                    data.Search.forEach(movie => createMovieCard(movie));
+                } else {
+                    if(data.Error === 'Movie not found!') showError("چیزی با این اسم پیدا نشد. املای انگلیسی رو چک کن! 🤔");
+                    else if(data.Error === 'Request limit reached!') showError("ظرفیت استفاده روزانه از کلید تمام شده! فردا تلاش کن.");
+                    else showError(`خطای سرور: ${data.Error}`);
+                }
+            } catch (error) {
+                showLoading(false);
+                if (error.name === 'AbortError') showError("پاسخی از سرور دریافت نشد. سرعت اینترنتت رو چک کن!");
+                else showError("خطا در اتصال! اینترنت یا فیلترشکن رو بررسی کن. 🔌");
+            }
+        }
+
+        // 3. ساخت کارت فیلم (HTML)
+        function createMovieCard(movie) {
+            const posterUrl = movie.Poster !== 'N/A' ? movie.Poster : 'https://via.placeholder.com/300x450/1a1a1a/aaaaaa?text=بدون+تصویر';
+            const typeLabel = movie.Type === 'series' ? 'سریال 📺' : 'فیلم 🎬';
+            
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            card.onclick = () => openPlayerModal(movie.imdbID, movie.Type);
+            card.innerHTML = `
+                <div class="poster-container">
+                    <img src="${posterUrl}" alt="${movie.Title}" loading="lazy">
+                    <div class="badge">${typeLabel}</div>
+                </div>
+                <div class="movie-info">
+                    <h3>${movie.Title}</h3>
+                    <p>سال ساخت: ${movie.Year}</p>
+                </div>
+            `;
+            resultsGrid.appendChild(card);
+        }
+
+        // 4. باز کردن مودال و تنظیم سرورها
+        function openPlayerModal(id, type) {
+            currentMovieId = id;
+            currentMovieType = (type === 'series') ? 'tv' : 'movie';
+            
+            const modal = document.getElementById('playerModal');
+            modal.style.display = 'flex';
+            
+            // تنظیم دکمه‌های سرور
+            const serverBtns = document.getElementById('serverButtons');
+            serverBtns.innerHTML = `
+                <button class="server-btn active" onclick="loadServer(1, this)">سرور اصلی (VidSrc) 💎</button>
+                <button class="server-btn" onclick="loadServer(2, this)">سرور کمکی 1 (Pro) ⚡</button>
+                <button class="server-btn" onclick="loadServer(3, this)">سرور کمکی 2 (Super) 🚀</button>
+            `;
+            // لود کردن سرور اول به صورت پیشفرض
+            loadServer(1, serverBtns.children[0]);
+        }
+
+        // 5. لود کردن آیفریم بر اساس سرور انتخابی
+        function loadServer(serverNum, btnElement) {
+            const container = document.getElementById('videoFrameContainer');
+            
+            // تغییر استایل دکمه فعال
+            document.querySelectorAll('.server-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            container.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100%;color:var(--primary-color);">در حال اتصال به سرور پخش... 📡</div>';
+
+            let embedUrl = "";
+            switch(serverNum) {
+                case 1: embedUrl = `https://vidsrc.me/embed/${currentMovieType}?imdb=${currentMovieId}`; break;
+                case 2: embedUrl = `https://vidsrc.to/embed/${currentMovieType}/${currentMovieId}`; break;
+                case 3: embedUrl = `https://vidsrc.xyz/embed/${currentMovieType}/${currentMovieId}`; break;
+            }
+
+            // استفاده از setTimeout برای اطمینان از رندر شدن پیام لودینگ قبل از شروع آیفریم
+            setTimeout(() => {
+                container.innerHTML = `<iframe src="${embedUrl}" allowfullscreen scrolling="no" frameborder="0"></iframe>`;
+            }, 500);
+        }
+
+        // 6. بستن مودال
+        function closePlayer() {
+            document.getElementById('playerModal').style.display = 'none';
+            document.getElementById('videoFrameContainer').innerHTML = ''; // پاک کردن آیفریم برای قطع صدا
+        }
+
+        function handleModalClick(e) {
+            if(e.target === document.getElementById('playerModal')) closePlayer();
+        }
+    </script>
+</body>
+</html>
